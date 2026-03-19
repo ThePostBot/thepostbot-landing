@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'All fields are required' });
   }
 
-  const today = new Date();
+  const today = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Dubai"}));
   const trialEnd = new Date();
   trialEnd.setDate(today.getDate() + 7);
   const formatDate = (d) => d.toISOString().split('T')[0];
