@@ -1,3 +1,5 @@
+import nodemailer from 'nodemailer';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -31,21 +33,18 @@ export default async function handler(req, res) {
     if (searchData.records && searchData.records.length > 0) {
       const status = searchData.records[0].fields.Status;
 
-      // Still on free trial
       if (status === 'trial') {
         return res.status(400).json({
           error: 'You already have an active free trial. Check your inbox every morning for your 3 posts!'
         });
       }
 
-      // Already a paying subscriber
       if (status === 'active') {
         return res.status(400).json({
           error: 'You already have an active subscription. Your posts are delivered every morning — check your inbox!'
         });
       }
 
-      // Trial was used — expired or cancelled
       if (status === 'expired' || status === 'cancelled') {
         return res.status(400).json({
           error: 'You have already used your free trial. To continue receiving your daily LinkedIn posts, please subscribe at $9/month. Email us at hello@thepostbot.me to get started.'
@@ -90,7 +89,6 @@ export default async function handler(req, res) {
     }
 
     // SEND WELCOME EMAIL
-    const nodemailer = require('nodemailer');
     const transporter = nodemailer.createTransport({
       host: 'smtp.hostinger.com',
       port: 465,
@@ -115,4 +113,3 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Server error. Please try again.' });
   }
 }
-```
