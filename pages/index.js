@@ -16,9 +16,16 @@ const TONES = [
   'Educational & Informative','Witty & Humorous',
 ];
 
-// 40 floating elements spread across entire page
+const COUNTRIES = [
+  'United Arab Emirates','Saudi Arabia','Pakistan','India','United Kingdom',
+  'United States','Canada','Australia','Singapore','Qatar','Kuwait','Bahrain',
+  'Oman','Egypt','Jordan','Turkey','Germany','France','Netherlands','Sweden',
+  'Switzerland','Italy','Spain','South Africa','Nigeria','Kenya','Bangladesh',
+  'Sri Lanka','Philippines','Malaysia','Indonesia','New Zealand','Ireland',
+  'Other',
+];
+
 const BUBBLES = [
-  // Notifications
   { icon: '🔔', text: 'Your post reached 14,200 impressions', sub: '2 min ago' },
   { icon: '👍', text: '1,247 reactions on your post', sub: 'Trending now' },
   { icon: '👀', text: '380 people viewed your profile', sub: 'Up 420% this week' },
@@ -43,7 +50,7 @@ const BUBBLES = [
 
 export default function Home() {
   const router = useRouter();
-  const [form, setForm] = useState({ name: '', email: '', niche: '', tone: '' });
+  const [form, setForm] = useState({ name: '', email: '', niche: '', tone: '', country: '', keyword: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [focusedField, setFocusedField] = useState(null);
@@ -52,10 +59,9 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true);
-    // Generate random positions for all bubbles
-    const pos = BUBBLES.map((_, i) => ({
-      left: Math.random() * 95,
-      top: Math.random() * 800, // spread across full page height in vh-like units
+    const pos = BUBBLES.map(() => ({
+      left: Math.random() * 92,
+      top: Math.random() * 900,
       duration: 5 + Math.random() * 6,
       delay: Math.random() * 4,
       scale: 0.75 + Math.random() * 0.35,
@@ -106,65 +112,30 @@ export default function Home() {
         ::-webkit-scrollbar{width:4px;}
         ::-webkit-scrollbar-track{background:#060A12;}
         ::-webkit-scrollbar-thumb{background:#1a2535;border-radius:2px;}
-
-        @keyframes floatUp{
-          0%{transform:translateY(0px) rotate(var(--r));}
-          50%{transform:translateY(-20px) rotate(calc(var(--r) + 1deg));}
-          100%{transform:translateY(0px) rotate(var(--r));}
-        }
+        @keyframes floatUp{0%{transform:translateY(0px) rotate(var(--r));}50%{transform:translateY(-20px) rotate(calc(var(--r) + 1deg));}100%{transform:translateY(0px) rotate(var(--r));}}
         @keyframes fadeIn{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
-
-        .bubble{
-          position:absolute;
-          background:rgba(255,255,255,0.035);
-          backdrop-filter:blur(6px);
-          border:1px solid rgba(255,255,255,0.06);
-          border-radius:12px;
-          padding:10px 13px;
-          display:flex;
-          align-items:flex-start;
-          gap:9px;
-          width:210px;
-          animation:floatUp var(--dur) ease-in-out infinite var(--delay);
-          pointer-events:none;
-          z-index:0;
-        }
-        .bubble-icon{font-size:18px;line-height:1;margin-top:1px;flex-shrink:0;}
-        .bubble-text{font-size:11px;font-weight:600;color:rgba(255,255,255,0.7);line-height:1.35;}
-        .bubble-sub{font-size:10px;color:rgba(255,255,255,0.3);margin-top:2px;}
-
+        .bubble{position:absolute;background:rgba(255,255,255,0.035);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:10px 13px;display:flex;align-items:flex-start;gap:9px;width:210px;animation:floatUp var(--dur) ease-in-out infinite var(--delay);pointer-events:none;z-index:0;}
+        .bi{font-size:18px;line-height:1;margin-top:1px;flex-shrink:0;}
+        .bt{font-size:11px;font-weight:600;color:rgba(255,255,255,0.7);line-height:1.35;}
+        .bs{font-size:10px;color:rgba(255,255,255,0.3);margin-top:2px;}
         .fu1{animation:fadeIn 0.7s ease both;}
         .fu2{animation:fadeIn 0.7s 0.15s ease both;opacity:0;}
         .fu3{animation:fadeIn 0.7s 0.3s ease both;opacity:0;}
         .fu4{animation:fadeIn 0.7s 0.45s ease both;opacity:0;}
         .fu5{animation:fadeIn 0.7s 0.6s ease both;opacity:0;}
-
         .btn{background:#0A66C2;color:#fff;border:none;border-radius:10px;padding:14px 32px;font-family:DM Sans,sans-serif;font-weight:600;font-size:1rem;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px;text-decoration:none;box-shadow:0 4px 24px rgba(10,102,194,0.3);}
         .btn:hover{background:#004182;transform:translateY(-2px);box-shadow:0 8px 30px rgba(10,102,194,0.4);}
-
         .card{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:26px;transition:all 0.25s;}
         .card:hover{background:rgba(10,102,194,0.07);border-color:rgba(10,102,194,0.3);transform:translateY(-4px);}
-
         .chip{display:inline-block;background:rgba(10,102,194,0.1);border:1px solid rgba(10,102,194,0.2);color:#5B9BD5;padding:5px 14px;border-radius:100px;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:14px;}
-
         @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
         .dot{width:7px;height:7px;border-radius:50%;background:#0A66C2;display:inline-block;animation:pulse 2s infinite;margin-right:6px;}
-
         select option{background:#0d1117;color:#fff;}
-
-        @media(max-width:768px){
-          .hide-mob{display:none!important;}
-          .grid2{grid-template-columns:1fr!important;}
-          .grid4{grid-template-columns:1fr 1fr!important;}
-          .pgrid{grid-template-columns:1fr!important;}
-          .nav-right span{display:none!important;}
-        }
-        @media(max-width:480px){
-          .grid4{grid-template-columns:1fr!important;}
-        }
+        @media(max-width:768px){.hide-mob{display:none!important;}.grid2{grid-template-columns:1fr!important;}.grid4{grid-template-columns:1fr 1fr!important;}.pgrid{grid-template-columns:1fr!important;}.nav-spot{display:none!important;}}
+        @media(max-width:480px){.grid4{grid-template-columns:1fr!important;}}
       `}</style>
 
-      {/* Full-page bubble background — rendered behind everything */}
+      {/* Full page floating bubbles */}
       {mounted && (
         <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
           {BUBBLES.map((b, i) => {
@@ -173,24 +144,17 @@ export default function Home() {
             const rot = (Math.random() * 4 - 2).toFixed(1);
             return (
               <div key={i} className="bubble hide-mob" style={{
-                left: `${pos.left}%`,
-                top: `${pos.top}%`,
-                opacity: 0.25 + Math.random() * 0.12,
-                '--dur': `${pos.duration}s`,
-                '--delay': `${pos.delay}s`,
-                '--r': `${rot}deg`,
+                left: `${pos.left}%`, top: `${pos.top}%`,
+                opacity: 0.22 + Math.random() * 0.1,
+                '--dur': `${pos.duration}s`, '--delay': `${pos.delay}s`, '--r': `${rot}deg`,
                 transform: `scale(${pos.scale}) rotate(${rot}deg)`,
               }}>
-                <span className="bubble-icon">{b.icon}</span>
-                <div>
-                  <div className="bubble-text">{b.text}</div>
-                  <div className="bubble-sub">{b.sub}</div>
-                </div>
+                <span className="bi">{b.icon}</span>
+                <div><div className="bt">{b.text}</div><div className="bs">{b.sub}</div></div>
               </div>
             );
           })}
-          {/* Subtle vignette to keep text readable */}
-          <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(6,10,18,0.5) 0%, rgba(6,10,18,0.85) 100%)' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(6,10,18,0.5) 0%, rgba(6,10,18,0.88) 100%)' }} />
         </div>
       )}
 
@@ -201,61 +165,39 @@ export default function Home() {
           <div style={{ fontFamily: 'Syne,sans-serif', fontWeight: 800, fontSize: '1.3rem', letterSpacing: '-0.01em' }}>
             The<span style={{ color: '#0A66C2' }}>Post</span>Bot
           </div>
-          <div className="nav-right" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <span style={{ color: 'rgba(255,255,255,0.38)', fontSize: '0.82rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+            <span className="nav-spot" style={{ color: 'rgba(255,255,255,0.38)', fontSize: '0.82rem' }}>
               <span style={{ color: '#0A66C2', fontWeight: 600 }}>20 spots</span> left at $9/mo
             </span>
-            <a href="#signup" className="btn" style={{ padding: '0.55rem 1.2rem', fontSize: '0.875rem' }}>
-              Start Free Trial
-            </a>
+            <a href="#signup" className="btn" style={{ padding: '0.55rem 1.2rem', fontSize: '0.875rem' }}>Start Free Trial</a>
           </div>
         </nav>
 
         {/* HERO */}
         <section style={{ minHeight: '94vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '5rem 2rem', textAlign: 'center' }}>
           <div style={{ maxWidth: '760px' }}>
-
             <div className="fu1" style={{ marginBottom: '1.75rem' }}>
               <span style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(10,102,194,0.1)', border: '1px solid rgba(10,102,194,0.22)', color: '#5B9BD5', padding: '6px 18px', borderRadius: '100px', fontSize: '12px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                <span className="dot" />
-                Founding Member · $9/mo forever · Only 20 spots left
+                <span className="dot" />Founding Member · $9/mo forever · Only 20 spots left
               </span>
             </div>
-
             <div className="fu2">
               <h1 style={{ fontFamily: 'Syne,sans-serif', fontWeight: 800, lineHeight: 1.06, letterSpacing: '-0.025em', marginBottom: '1.75rem' }}>
-                <span style={{ display: 'block', fontSize: 'clamp(1.4rem,3.5vw,2rem)', color: 'rgba(255,255,255,0.5)', fontWeight: 700, marginBottom: '0.3rem' }}>
-                  Stop staring at a blank LinkedIn box.
-                </span>
-                <span style={{ display: 'block', fontSize: 'clamp(2.8rem,7vw,5.2rem)', color: '#fff' }}>
-                  Get <span style={{ color: '#0A66C2' }}>3 posts</span> delivered<br />
-                  to your inbox.
-                </span>
-                <span style={{ display: 'block', fontSize: 'clamp(1.2rem,3vw,1.6rem)', color: 'rgba(255,255,255,0.45)', fontWeight: 500, marginTop: '0.4rem' }}>
-                  Every single morning. Automatically.
-                </span>
+                <span style={{ display: 'block', fontSize: 'clamp(1.3rem,3vw,1.8rem)', color: 'rgba(255,255,255,0.5)', fontWeight: 600, marginBottom: '0.3rem' }}>Stop staring at a blank LinkedIn box.</span>
+                <span style={{ display: 'block', fontSize: 'clamp(2.8rem,7vw,5rem)', color: '#fff' }}>Get <span style={{ color: '#0A66C2' }}>3 posts</span> delivered<br />to your inbox.</span>
+                <span style={{ display: 'block', fontSize: 'clamp(1.1rem,2.5vw,1.5rem)', color: 'rgba(255,255,255,0.4)', fontWeight: 500, marginTop: '0.4rem' }}>Every single morning. Automatically.</span>
               </h1>
             </div>
-
             <p className="fu3" style={{ fontSize: 'clamp(1rem,2.5vw,1.15rem)', color: 'rgba(255,255,255,0.48)', lineHeight: 1.8, maxWidth: '520px', margin: '0 auto 2.5rem' }}>
-              AI-written, news-based, image-included — in your tone, for your niche.
+              AI-written, news-based, image-included — in your tone, for your niche, relevant to your country.
               Pick one, post it. <strong style={{ color: 'rgba(255,255,255,0.8)' }}>Zero effort. Real results.</strong>
             </p>
-
             <div className="fu4" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', alignItems: 'center', marginBottom: '2.5rem' }}>
-              <a href="#signup" className="btn" style={{ fontSize: '1.05rem', padding: '15px 36px' }}>
-                Start My Free 7-Day Trial →
-              </a>
+              <a href="#signup" className="btn" style={{ fontSize: '1.05rem', padding: '15px 36px' }}>Start My Free 7-Day Trial →</a>
               <span style={{ color: 'rgba(255,255,255,0.28)', fontSize: '0.875rem' }}>✓ No credit card needed</span>
             </div>
-
-            {/* Social proof signals */}
             <div className="fu5" style={{ display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}>
-              {[
-                { icon: '👍', val: '2,300+', label: 'reactions/week avg' },
-                { icon: '👀', val: '12,400', label: 'impressions per post' },
-                { icon: '🔁', val: '94', label: 'reposts per post avg' },
-              ].map((s, i) => (
+              {[{ icon: '👍', val: '2,300+', label: 'reactions/week avg' }, { icon: '👀', val: '12,400', label: 'impressions per post' }, { icon: '🔁', val: '94', label: 'reposts per post avg' }].map((s, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{ fontSize: '18px' }}>{s.icon}</span>
                   <div>
@@ -282,15 +224,13 @@ export default function Home() {
         <section style={{ maxWidth: '1000px', margin: '0 auto', padding: 'clamp(5rem,10vw,8rem) 2rem' }}>
           <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
             <div className="chip">How it works</div>
-            <h2 style={{ fontFamily: 'Syne,sans-serif', fontSize: 'clamp(2rem,5vw,3.2rem)', fontWeight: 800, letterSpacing: '-0.02em' }}>
-              Set it once. Get posts forever.
-            </h2>
+            <h2 style={{ fontFamily: 'Syne,sans-serif', fontSize: 'clamp(2rem,5vw,3.2rem)', fontWeight: 800, letterSpacing: '-0.02em' }}>Set it once. Get posts forever.</h2>
           </div>
           <div className="grid4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '1.25rem' }}>
             {[
-              { n: '01', e: '⚡', t: 'Tell us your niche & tone', d: '30-second setup. Your industry, your voice. Never repeat it.' },
-              { n: '02', e: '🤖', t: 'AI works while you sleep', d: "Every night we scan today's trending news and write 3 unique posts with images." },
-              { n: '03', e: '📬', t: '3 posts hit your inbox', d: 'Wake up to ready-to-post content. Different angles, every single day.' },
+              { n: '01', e: '⚡', t: 'Tell us your niche & tone', d: '30-second setup. Your industry, your voice, your country. Never repeat it.' },
+              { n: '02', e: '🤖', t: 'AI works while you sleep', d: "Every night we scan today's trending news in your country and niche and write 3 unique posts." },
+              { n: '03', e: '📬', t: '3 posts hit your inbox', d: 'Wake up to ready-to-post content. Different formats, different angles, every single day.' },
               { n: '04', e: '🚀', t: 'Pick one. Post. Done.', d: 'Copy, paste to LinkedIn. 10 seconds. Your audience is amazed.' },
             ].map((s, i) => (
               <div key={i} className="card">
@@ -310,19 +250,15 @@ export default function Home() {
           <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
               <div className="chip">Why ThePostBot</div>
-              <h2 style={{ fontFamily: 'Syne,sans-serif', fontSize: 'clamp(2rem,5vw,3.2rem)', fontWeight: 800, letterSpacing: '-0.02em' }}>
-                Every other tool makes you do the work.
-              </h2>
-              <p style={{ color: 'rgba(255,255,255,0.38)', marginTop: '1rem', maxWidth: '460px', margin: '1rem auto 0', lineHeight: 1.7 }}>
-                They're writing assistants. You still log in, think of ideas, generate, edit, schedule. ThePostBot works for you — not with you.
-              </p>
+              <h2 style={{ fontFamily: 'Syne,sans-serif', fontSize: 'clamp(2rem,5vw,3.2rem)', fontWeight: 800, letterSpacing: '-0.02em' }}>Every other tool makes you do the work.</h2>
+              <p style={{ color: 'rgba(255,255,255,0.38)', marginTop: '1rem', maxWidth: '460px', margin: '1rem auto 0', lineHeight: 1.7 }}>They're writing assistants. You still log in, think of ideas, generate, edit, schedule. ThePostBot works for you — not with you.</p>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: '1rem' }}>
               {[
-                { e: '📰', t: "Based on today's news", d: "Every post is inspired by what's actually trending in your industry right now." },
-                { e: '🎯', t: 'Your tone, your voice', d: 'Inspirational? Data-driven? Provocative? Written in your style every time.' },
+                { e: '📰', t: "Based on today's news", d: "Every post is inspired by what's actually trending in your country and industry right now." },
+                { e: '🎯', t: 'Your tone, your voice', d: 'Inspirational? Data-driven? Provocative? Written in your exact style every single time.' },
                 { e: '🖼️', t: 'Images included', d: 'Every post comes with a professionally sourced matching image. No hunting required.' },
-                { e: '🔒', t: 'Uniquely yours', d: 'Even if two users share the same niche, they never receive the same posts.' },
+                { e: '🌍', t: 'Country-specific content', d: 'Posts are tailored to your country and region — not generic global content.' },
                 { e: '💸', t: 'Fraction of the cost', d: 'Competitors charge $60–$200/month. Your founding price: $9/month. Forever.' },
                 { e: '📲', t: 'No app to open', d: 'Straight to your email inbox — the one thing you already check every morning.' },
               ].map((f, i) => (
@@ -350,7 +286,7 @@ export default function Home() {
                 <span style={{ color: 'rgba(255,255,255,0.38)' }}>/month</span>
               </div>
               <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.82rem', marginBottom: '1.75rem' }}>Locked forever — price never increases</p>
-              {['3 unique AI posts daily', 'News-based content', 'Images included', '7-day free trial', 'Cancel anytime'].map((f, i) => (
+              {['3 unique AI posts daily', 'Country-specific news', 'Images included', '7-day free trial', 'Cancel anytime'].map((f, i) => (
                 <div key={i} style={{ display: 'flex', gap: '8px', marginBottom: '9px', fontSize: '0.88rem', color: 'rgba(255,255,255,0.72)' }}>
                   <span style={{ color: '#0A66C2' }}>✓</span> {f}
                 </div>
@@ -364,7 +300,7 @@ export default function Home() {
                 <span style={{ color: 'rgba(255,255,255,0.18)' }}>/month</span>
               </div>
               <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.82rem', marginBottom: '1.75rem' }}>For everyone after founding spots are gone</p>
-              {['3 unique AI posts daily', 'News-based content', 'Images included', '7-day free trial', 'Cancel anytime'].map((f, i) => (
+              {['3 unique AI posts daily', 'Country-specific news', 'Images included', '7-day free trial', 'Cancel anytime'].map((f, i) => (
                 <div key={i} style={{ display: 'flex', gap: '8px', marginBottom: '9px', fontSize: '0.88rem', color: 'rgba(255,255,255,0.2)' }}>
                   <span>✓</span> {f}
                 </div>
@@ -376,41 +312,93 @@ export default function Home() {
 
         {/* SIGNUP */}
         <section id="signup" style={{ background: 'rgba(0,0,0,0.25)', borderTop: '1px solid rgba(255,255,255,0.05)', padding: 'clamp(5rem,10vw,8rem) 2rem' }}>
-          <div style={{ maxWidth: '540px', margin: '0 auto' }}>
+          <div style={{ maxWidth: '560px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
               <div className="chip">Start Free Trial</div>
-              <h2 style={{ fontFamily: 'Syne,sans-serif', fontSize: 'clamp(1.9rem,5vw,2.75rem)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '0.75rem' }}>
-                Your first posts arrive<br />tomorrow morning.
-              </h2>
+              <h2 style={{ fontFamily: 'Syne,sans-serif', fontSize: 'clamp(1.9rem,5vw,2.75rem)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '0.75rem' }}>Your first posts arrive<br />tomorrow morning.</h2>
               <p style={{ color: 'rgba(255,255,255,0.38)', fontSize: '0.95rem' }}>7 days free. No credit card. Cancel anytime.</p>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '20px', padding: 'clamp(1.5rem,5vw,2.5rem)' }}>
               <div style={{ display: 'grid', gap: '1rem' }}>
-                {[{ k: 'name', l: 'Full Name', t: 'text', p: 'Your name' }, { k: 'email', l: 'Email Address', t: 'email', p: 'you@company.com' }].map(f => (
-                  <div key={f.k}>
-                    <label style={{ display: 'block', color: 'rgba(255,255,255,0.32)', fontSize: '11px', fontWeight: 600, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{f.l}</label>
-                    <input type={f.t} placeholder={f.p} value={form[f.k]} required
-                      onChange={e => setForm({ ...form, [f.k]: e.target.value })}
-                      onFocus={() => setFocusedField(f.k)} onBlur={() => setFocusedField(null)}
-                      style={inp(f.k)} />
+
+                {/* Name */}
+                <div>
+                  <label style={{ display: 'block', color: 'rgba(255,255,255,0.32)', fontSize: '11px', fontWeight: 600, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Full Name</label>
+                  <input type="text" placeholder="Your name" value={form.name} required
+                    onChange={e => setForm({ ...form, name: e.target.value })}
+                    onFocus={() => setFocusedField('name')} onBlur={() => setFocusedField(null)}
+                    style={inp('name')} />
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label style={{ display: 'block', color: 'rgba(255,255,255,0.32)', fontSize: '11px', fontWeight: 600, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Email Address</label>
+                  <input type="email" placeholder="you@company.com" value={form.email} required
+                    onChange={e => setForm({ ...form, email: e.target.value })}
+                    onFocus={() => setFocusedField('email')} onBlur={() => setFocusedField(null)}
+                    style={inp('email')} />
+                </div>
+
+                {/* Country */}
+                <div>
+                  <label style={{ display: 'block', color: 'rgba(255,255,255,0.32)', fontSize: '11px', fontWeight: 600, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Your Country</label>
+                  <div style={{ position: 'relative' }}>
+                    <select value={form.country} required
+                      onChange={e => setForm({ ...form, country: e.target.value })}
+                      onFocus={() => setFocusedField('country')} onBlur={() => setFocusedField(null)}
+                      style={{ ...inp('country'), cursor: 'pointer', color: form.country ? '#fff' : 'rgba(255,255,255,0.28)' }}>
+                      <option value="" disabled>Select your country</option>
+                      {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                    <span style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.28)', pointerEvents: 'none' }}>▾</span>
                   </div>
-                ))}
-                {[{ k: 'niche', l: 'Your Niche / Industry', p: 'Select your industry', opts: NICHES }, { k: 'tone', l: 'Writing Tone', p: 'Select your tone', opts: TONES }].map(f => (
-                  <div key={f.k}>
-                    <label style={{ display: 'block', color: 'rgba(255,255,255,0.32)', fontSize: '11px', fontWeight: 600, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{f.l}</label>
-                    <div style={{ position: 'relative' }}>
-                      <select value={form[f.k]} required
-                        onChange={e => setForm({ ...form, [f.k]: e.target.value })}
-                        onFocus={() => setFocusedField(f.k)} onBlur={() => setFocusedField(null)}
-                        style={{ ...inp(f.k), cursor: 'pointer', color: form[f.k] ? '#fff' : 'rgba(255,255,255,0.28)' }}>
-                        <option value="" disabled>{f.p}</option>
-                        {f.opts.map(o => <option key={o} value={o}>{o}</option>)}
-                      </select>
-                      <span style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.28)', pointerEvents: 'none' }}>▾</span>
-                    </div>
+                </div>
+
+                {/* Niche */}
+                <div>
+                  <label style={{ display: 'block', color: 'rgba(255,255,255,0.32)', fontSize: '11px', fontWeight: 600, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Your Niche / Industry</label>
+                  <div style={{ position: 'relative' }}>
+                    <select value={form.niche} required
+                      onChange={e => setForm({ ...form, niche: e.target.value })}
+                      onFocus={() => setFocusedField('niche')} onBlur={() => setFocusedField(null)}
+                      style={{ ...inp('niche'), cursor: 'pointer', color: form.niche ? '#fff' : 'rgba(255,255,255,0.28)' }}>
+                      <option value="" disabled>Select your industry</option>
+                      {NICHES.map(n => <option key={n} value={n}>{n}</option>)}
+                    </select>
+                    <span style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.28)', pointerEvents: 'none' }}>▾</span>
                   </div>
-                ))}
+                </div>
+
+                {/* Tone */}
+                <div>
+                  <label style={{ display: 'block', color: 'rgba(255,255,255,0.32)', fontSize: '11px', fontWeight: 600, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Writing Tone</label>
+                  <div style={{ position: 'relative' }}>
+                    <select value={form.tone} required
+                      onChange={e => setForm({ ...form, tone: e.target.value })}
+                      onFocus={() => setFocusedField('tone')} onBlur={() => setFocusedField(null)}
+                      style={{ ...inp('tone'), cursor: 'pointer', color: form.tone ? '#fff' : 'rgba(255,255,255,0.28)' }}>
+                      <option value="" disabled>Select your tone</option>
+                      {TONES.map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                    <span style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.28)', pointerEvents: 'none' }}>▾</span>
+                  </div>
+                </div>
+
+                {/* Optional Keyword */}
+                <div>
+                  <label style={{ display: 'block', color: 'rgba(255,255,255,0.32)', fontSize: '11px', fontWeight: 600, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                    Specific Topic or Keyword <span style={{ color: 'rgba(255,255,255,0.2)', fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(optional)</span>
+                  </label>
+                  <input type="text" placeholder="e.g. AI in healthcare, Tesla, remote work, Dubai real estate"
+                    value={form.keyword}
+                    onChange={e => setForm({ ...form, keyword: e.target.value })}
+                    onFocus={() => setFocusedField('keyword')} onBlur={() => setFocusedField(null)}
+                    style={inp('keyword')} />
+                  <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '11px', marginTop: '5px' }}>Leave empty to use today's trending news automatically</p>
+                </div>
+
                 {error && <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', color: '#FCA5A5', padding: '12px 16px', borderRadius: '10px', fontSize: '0.875rem' }}>{error}</div>}
+
                 <button onClick={handleSubmit} disabled={loading}
                   style={{ marginTop: '6px', background: loading ? 'rgba(255,255,255,0.07)' : '#0A66C2', color: loading ? 'rgba(255,255,255,0.3)' : '#fff', border: 'none', borderRadius: '10px', padding: '1rem', fontFamily: 'DM Sans,sans-serif', fontWeight: 600, fontSize: '1rem', cursor: loading ? 'not-allowed' : 'pointer', width: '100%', transition: 'all 0.2s', boxShadow: loading ? 'none' : '0 4px 20px rgba(10,102,194,0.28)' }}
                   onMouseEnter={e => { if (!loading) e.currentTarget.style.background = '#004182'; }}
