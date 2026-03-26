@@ -358,7 +358,7 @@ export default function Home() {
                 {/* Email */}
                 <div>
                   <label style={{ display: 'block', color: 'rgba(255,255,255,0.32)', fontSize: '11px', fontWeight: 600, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Email Address</label>
-                  <input type="email" placeholder="you@company.com" value={form.email} required
+                  <input type="email" placeholder="you@email.com" value={form.email} required
                     onChange={e => setForm({ ...form, email: e.target.value })}
                     onFocus={() => setFocusedField('email')} onBlur={() => setFocusedField(null)}
                     style={inp('email')} />
