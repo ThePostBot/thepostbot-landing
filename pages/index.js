@@ -50,7 +50,7 @@ const COUNTRIES = [
   'Zambia','Zimbabwe',
 ];
 
-// 36 notifications — dense enough to fill entire page background
+// 50 notifications — maximum density across full page
 const NOTIFICATIONS = [
   { icon: '🔔', text: 'Your post reached 14,200 impressions', sub: '2 min ago' },
   { icon: '👍', text: '1,247 people reacted to your post', sub: 'Trending in your network' },
@@ -78,16 +78,38 @@ const NOTIFICATIONS = [
   { icon: '💰', text: 'Inbound DM from a prospect', sub: 'Saw your post today' },
   { icon: '🌟', text: 'You\'re a top creator today', sub: 'In Entrepreneurship' },
   { icon: '📱', text: '67% mobile engagement', sub: 'Posts optimised perfectly' },
-  { icon: '🎖️', text: 'Weekly goal achieved', sub: '5 posts this week ✓' },
-  { icon: '👁️', text: '2,400 post views today', sub: 'Best day this month' },
-  { icon: '🔗', text: '18 link clicks from your post', sub: 'High CTR content' },
-  { icon: '📩', text: 'New newsletter subscribers', sub: 'From your LinkedIn posts' },
+  { icon: '🔔', text: 'Your post is going viral', sub: '3x normal share rate' },
+  { icon: '💬', text: 'New comment from a CEO', sub: 'Great insight!' },
+  { icon: '👍', text: '2,000 likes this week', sub: 'Best week ever' },
+  { icon: '🚀', text: 'Post boosted by LinkedIn', sub: 'Algorithm loves you' },
+  { icon: '📩', text: 'New newsletter subscribers', sub: 'From your post today' },
   { icon: '🏅', text: 'Top 1% post this week', sub: 'In your industry' },
-  { icon: '💎', text: 'Premium profile badge earned', sub: 'Keep it up!' },
-  { icon: '🗣️', text: '156 people saw your comment', sub: 'On a viral post' },
-  { icon: '⚡', text: 'Post going viral right now', sub: 'Share rate 3x normal' },
-  { icon: '🎊', text: '1,000 followers milestone!', sub: 'Thanks to consistent posting' },
+  { icon: '🔥', text: 'Trending in UAE today', sub: 'Your post is everywhere' },
+  { icon: '⚡', text: 'Post velocity: exceptional', sub: '400 views in 10 min' },
+  { icon: '🎊', text: '1,000 followers milestone!', sub: 'Consistent posting works' },
   { icon: '📰', text: 'Journalist viewed your profile', sub: 'After reading your post' },
+  { icon: '💎', text: 'Premium creator status', sub: 'Earned this week' },
+  { icon: '🗣️', text: '156 people saw your comment', sub: 'On a viral post' },
+  { icon: '👁️', text: '2,400 post views today', sub: 'Best day this month' },
+  { icon: '🔗', text: '18 link clicks from post', sub: 'High CTR content' },
+  { icon: '🌐', text: 'Post shared internationally', sub: 'Across 8 countries' },
+  { icon: '📲', text: 'Someone screenshotted your post', sub: 'That\'s viral content' },
+  { icon: '🎖️', text: 'Weekly posting goal achieved', sub: '5 posts this week ✓' },
+  { icon: '💬', text: 'Your comment got 47 likes', sub: 'Keep engaging!' },
+  { icon: '🔔', text: 'New follower from your story', sub: 'Authentic content wins' },
+  { icon: '📣', text: 'Brand mentioned your post', sub: 'You\'re being quoted' },
+  { icon: '⭐', text: 'Post of the day', sub: 'In Leadership niche' },
+  { icon: '🚀', text: 'Impressions up 780% today', sub: 'vs your 30-day avg' },
+  { icon: '💡', text: 'Your tip went viral', sub: '4,200 saves this week' },
+  { icon: '🏆', text: 'LinkedIn Top Creator', sub: 'Badge on your profile' },
+];
+
+// Floating emoji symbols — rockets, bells, messages scattered everywhere
+const SYMBOLS = [
+  '🚀','🔔','💬','❤️','👍','🔥','⚡','💡','📈','🌟',
+  '🎯','💎','🏆','✨','🎉','📣','🔁','💼','🌍','⭐',
+  '🚀','🔔','💬','👍','🔥','⚡','💡','📈','🌟','🎯',
+  '💎','🏆','✨','🎉','📣','🚀','🔔','💬','❤️','👍',
 ];
 
 export default function Home() {
@@ -98,28 +120,43 @@ export default function Home() {
   const [focusedField, setFocusedField] = useState(null);
   const [mounted, setMounted] = useState(false);
   const [bubbles, setBubbles] = useState([]);
+  const [symbols, setSymbols] = useState([]);
 
   useEffect(() => {
     setMounted(true);
-    // Distribute bubbles across the full page height — more density
+    // Notification bubbles — left and right edges only
     const generated = NOTIFICATIONS.map((n, i) => {
-      const col = i % 3; // 0=left, 1=center-ish, 2=right
+      const col = i % 2;
       let xBase;
-      if (col === 0) xBase = 1 + Math.random() * 14;       // far left
-      else if (col === 2) xBase = 82 + Math.random() * 14; // far right
-      else xBase = 20 + Math.random() * 58;                 // spread middle (mostly covered by veil)
+      if (col === 0) xBase = 0.5 + Math.random() * 13;
+      else xBase = 83 + Math.random() * 13;
       return {
         ...n,
         x: xBase,
-        y: (i / NOTIFICATIONS.length) * 95 + (Math.random() * 6 - 3),
+        y: (i / NOTIFICATIONS.length) * 97 + (Math.random() * 4 - 2),
         dur: 4 + Math.random() * 8,
-        delay: -(Math.random() * 8), // negative delay = already mid-animation on load
-        rot: (Math.random() * 8 - 4).toFixed(1),
-        floatDist: 12 + Math.random() * 18, // varied float distance
-        opacity: 0.42 + Math.random() * 0.22,
+        delay: -(Math.random() * 8),
+        rot: (Math.random() * 6 - 3).toFixed(1),
+        floatDist: 10 + Math.random() * 16,
+        opacity: 0.30 + Math.random() * 0.06, // 30–36% as requested
       };
     });
     setBubbles(generated);
+
+    // Floating emoji symbols — scattered everywhere across full page
+    const syms = SYMBOLS.map((s, i) => ({
+      emoji: s,
+      x: 2 + Math.random() * 94,
+      y: 1 + (i / SYMBOLS.length) * 96 + (Math.random() * 5 - 2.5),
+      size: 18 + Math.random() * 22,
+      dur: 3 + Math.random() * 9,
+      delay: -(Math.random() * 6),
+      rot: (Math.random() * 30 - 15).toFixed(1),
+      floatDist: 15 + Math.random() * 30,
+      opacity: 0.08 + Math.random() * 0.1, // very subtle — purely decorative
+      animType: i % 3,
+    }));
+    setSymbols(syms);
   }, []);
 
   const handleSubmit = async (e) => {
@@ -307,13 +344,34 @@ export default function Home() {
         @media (max-width: 480px) { .g4 { grid-template-columns: 1fr !important; } }
       `}</style>
 
-      {/* ─── BUBBLE LAYER ─── */}
+      {/* ─── BACKGROUND LAYER — symbols + notification bubbles ─── */}
       {mounted && (
         <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
+
+          {/* Floating emoji symbols — scattered all over, very subtle */}
+          {symbols.map((s, i) => {
+            const anims = ['floatA','floatB','floatC'];
+            return (
+              <div key={`s${i}`} className="hide-mob" style={{
+                position: 'absolute',
+                left: `${s.x}%`, top: `${s.y}%`,
+                fontSize: `${s.size}px`,
+                opacity: s.opacity,
+                '--rot': `${s.rot}deg`,
+                '--dist': `${s.floatDist}px`,
+                animation: `${anims[s.animType]} ${s.dur}s ease-in-out ${s.delay}s infinite`,
+                transform: `rotate(${s.rot}deg)`,
+                lineHeight: 1,
+                userSelect: 'none',
+              }}>{s.emoji}</div>
+            );
+          })}
+
+          {/* Notification bubbles — left and right edges */}
           {bubbles.map((b, i) => {
             const animClass = i % 3 === 0 ? 'floatA' : i % 3 === 1 ? 'floatB' : 'floatC';
             return (
-              <div key={i} className="notif hide-mob" style={{
+              <div key={`b${i}`} className="notif hide-mob" style={{
                 left: `${b.x}%`, top: `${b.y}%`,
                 opacity: b.opacity,
                 '--rot': `${b.rot}deg`,
@@ -328,6 +386,7 @@ export default function Home() {
               </div>
             );
           })}
+
           <div className="veil-center" />
           <div className="veil-edges" />
         </div>
