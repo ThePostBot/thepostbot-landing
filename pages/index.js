@@ -10,9 +10,12 @@ const FAQS = [
   {q:'How do I post to LinkedIn?',a:'You receive 3 posts in your email inbox each morning. Copy the post you like most and paste it directly into LinkedIn. That is your entire workflow — no app, no login, no scheduling tool needed.'},
   {q:'Can I change my niche or tone after signing up?',a:'Yes. Reply to any email with your updated niche or tone and we will update your profile within 24 hours.'},
   {q:'What if I do not like a post?',a:'Simply ignore it. You get 3 every morning — pick the one that resonates. If none of the 3 work consistently, email us and we will tune your profile.'},
-  {q:'What is the difference between monthly and yearly?',a:'Monthly gives you full flexibility at $19/month. Yearly saves you over 20% — paying $180/year instead of $228. Both plans include identical features.'},
+  {q:'What is the difference between monthly and yearly?',a:'Monthly gives you full flexibility at $19/month. Yearly saves you over 21% — paying $180/year instead of $228. Both plans include identical features.'},
   {q:'Is the founding price locked forever?',a:'Yes. Founding members who join now lock in the founding price for the lifetime of their subscription. After the 20 founding spots are gone the standard price applies.'},
 ];
+
+const MONTHLY_URL = 'https://checkout.dodopayments.com/buy/pdt_0NgxTm1CbxtKFGQH3Aal5?quantity=1';
+const YEARLY_URL = 'https://checkout.dodopayments.com/buy/pdt_0NgxTzuVqyHMHgMUT0rdV?quantity=1';
 
 export default function Home() {
   const router = useRouter();
@@ -50,6 +53,7 @@ export default function Home() {
   const inp=k=>({width:'100%',background:focused===k?'#fff':'#F9F8F5',border:`1px solid ${focused===k?'#0A66C2':'rgba(0,0,0,0.2)'}`,borderRadius:'4px',padding:'10px 12px',color:'rgba(0,0,0,0.9)',fontSize:'14px',fontFamily:"'Source Sans Pro',sans-serif",outline:'none',transition:'all 0.15s',appearance:'none',WebkitAppearance:'none',boxSizing:'border-box',boxShadow:focused===k?'0 0 0 1px #0A66C2':'none'});
 
   const mp=19,yp=180,ym=Math.round(yp/12),yd=Math.round((1-yp/(mp*12))*100);
+  const checkoutUrl = billing === 'monthly' ? MONTHLY_URL : YEARLY_URL;
 
   return(<>
     <Head>
@@ -129,7 +133,7 @@ export default function Home() {
 
     <div style={{background:'#F3F2EE',minHeight:'100vh'}}>
 
-      {/* NAV — Change 1: wordmark only, "Post" in blue */}
+      {/* NAV */}
       <nav style={{position:'sticky',top:0,zIndex:100,background:'#fff',borderBottom:'1px solid rgba(0,0,0,0.08)',boxShadow:'0 1px 4px rgba(0,0,0,0.04)'}}>
         <div style={{maxWidth:'1080px',margin:'0 auto',padding:'0 24px',height:'56px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
           <a href="/" style={{textDecoration:'none'}}>
@@ -145,9 +149,8 @@ export default function Home() {
             ))}
           </nav>
           <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
-            {/* Change 1: kept but minimal */}
             <span className="hide-mob" style={{fontSize:'11.5px',color:'rgba(0,0,0,0.42)'}}>
-              <span style={{color:'#0A66C2',fontWeight:700}}>20 founding spots</span> · $15/mo
+              <span style={{color:'#0A66C2',fontWeight:700}}>20 founding spots</span> · $19/mo
             </span>
             <a href="#signup" className="li-btn" style={{padding:'8px 18px',fontSize:'14px',animation:'none',boxShadow:'none'}}>Start free</a>
           </div>
@@ -161,7 +164,7 @@ export default function Home() {
             <div style={{display:'inline-flex',alignItems:'center',background:'#fff',border:'1px solid rgba(0,0,0,0.1)',borderRadius:'100px',padding:'6px 16px 6px 10px',boxShadow:'0 1px 4px rgba(0,0,0,0.06)'}}>
               <span className="live-dot"/>
               <span style={{fontSize:'13px',fontWeight:600,color:'rgba(0,0,0,0.65)'}}>Founding Member &nbsp;·&nbsp;</span>
-              <span style={{fontSize:'13px',fontWeight:700,color:'#0A66C2'}}>&nbsp;$15/mo locked · Only 20 spots</span>
+              <span style={{fontSize:'13px',fontWeight:700,color:'#0A66C2'}}>&nbsp;$19/mo locked · Only 20 spots</span>
             </div>
           </div>
           <h1 className="h1 a2" style={{maxWidth:'760px',margin:'0 auto 16px',color:'rgba(0,0,0,0.9)'}}>
@@ -177,7 +180,6 @@ export default function Home() {
           </div>
           <p className="a4 text-mut" style={{fontSize:'13px',marginBottom:'48px'}}>No credit card required · Cancel anytime</p>
 
-          {/* Change 2: improved email mock — bigger header text, aligned CTA button */}
           <div className="a5 float" style={{maxWidth:'820px',margin:'0 auto'}}>
             <div className="email-mock">
               <div className="mock-topbar">
@@ -214,7 +216,7 @@ export default function Home() {
       <div style={{background:'#fff',borderTop:'1px solid rgba(0,0,0,0.08)',borderBottom:'1px solid rgba(0,0,0,0.08)',padding:'20px 24px'}}>
         <div className="container">
           <div className="stats-grid" style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'16px',textAlign:'center'}}>
-            {[['3','posts every morning'],['3 days','free trial — no card'],['$15','founding price / month'],['0','effort from you']].map(([v,l])=>(
+            {[['3','posts every morning'],['3 days','free trial — no card'],['$19','founding price / month'],['0','effort from you']].map(([v,l])=>(
               <div key={l}>
                 <div style={{fontWeight:700,fontSize:'1.7rem',color:'#0A66C2',lineHeight:1}}>{v}</div>
                 <div style={{fontSize:'12px',color:'rgba(0,0,0,0.5)',marginTop:'4px'}}>{l}</div>
@@ -224,7 +226,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* HOW IT WORKS — Change 3: 2x2 grid */}
+      {/* HOW IT WORKS */}
       <section id="how" className="section">
         <div className="container" ref={r('how')}>
           <div style={{textAlign:'center',marginBottom:'36px',...fade('how')}}>
@@ -291,7 +293,7 @@ export default function Home() {
               {e:'📰',t:"Today's news, every day",d:"Posts based on what's trending in your country and niche. Never recycled."},
               {e:'🌍',t:'Country-specific content',d:'UAE gets UAE news. Pakistan gets Pakistan business news. Locally relevant.'},
               {e:'🖼️',t:'Images always included',d:'Every post comes with a matching AI-generated image. No extra steps needed.'},
-              {e:'💸',t:'A fraction of the cost',d:'Taplio charges $65/month. Your founding price: $15/month locked forever.'},
+              {e:'💸',t:'A fraction of the cost',d:'Taplio charges $65/month. Your founding price: $19/month locked forever.'},
             ].map(f=>(
               <div key={f.t} className="feat-card">
                 <div style={{fontSize:'1.5rem',marginBottom:'10px'}}>{f.e}</div>
@@ -303,7 +305,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Change 4: Pull quote in one line */}
+      {/* PULL QUOTE */}
       <div style={{background:'#EBF3FB',borderTop:'1px solid rgba(10,102,194,0.15)',borderBottom:'1px solid rgba(10,102,194,0.15)',padding:'44px 24px',textAlign:'center'}}>
         <div className="container">
           <p style={{fontWeight:700,fontSize:'clamp(1.1rem,2.4vw,1.7rem)',letterSpacing:'-0.01em',color:'rgba(0,0,0,0.85)'}}>
@@ -312,7 +314,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* PRICING — Change 5: Monthly $19, Yearly $180, toggle */}
+      {/* PRICING */}
       <section id="pricing" className="section-alt">
         <div className="container" ref={r('pricing')}>
           <div style={{textAlign:'center',marginBottom:'32px',...fade('pricing')}}>
@@ -337,8 +339,8 @@ export default function Home() {
                 </div>
                 {billing==='yearly'&&<p style={{color:'#057642',fontSize:'13px',fontWeight:600,marginBottom:'4px'}}>Billed ${yp}/year · Save ${mp*12-yp}/year</p>}
                 <p className="text-mut" style={{fontSize:'12px',marginBottom:'18px'}}>{billing==='monthly'?'Billed monthly · Cancel anytime':'Billed once per year · Cancel anytime'}</p>
-                <a href="#signup" className="li-btn" style={{display:'flex',justifyContent:'center',width:'100%',marginBottom:'20px',animation:'none'}}>
-                  {billing==='monthly'?'Claim founding price':'Claim yearly deal'}
+                <a href={checkoutUrl} target="_blank" rel="noopener noreferrer" className="li-btn" style={{display:'flex',justifyContent:'center',width:'100%',marginBottom:'20px',animation:'none'}}>
+                  {billing==='monthly'?'Claim Founding Price →':'Claim Yearly Deal →'}
                 </a>
                 {['3 AI posts in your inbox daily','News-based & country-specific','Different format every day','Matching images included','Price locked for founding members','3-day free trial to start'].map(f=>(
                   <div key={f} style={{display:'flex',gap:'8px',marginBottom:'9px',alignItems:'flex-start'}}>
@@ -370,7 +372,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FAQ — Change 6: stays before form */}
+      {/* FAQ */}
       <section className="section">
         <div className="container-sm" ref={r('faq')}>
           <div style={{textAlign:'center',marginBottom:'32px',...fade('faq')}}>
@@ -395,7 +397,7 @@ export default function Home() {
           <div style={fade('cta')}>
             <div className="li-label">Still thinking?</div>
             <h2 className="h2" style={{marginBottom:'12px'}}>Your first posts arrive tomorrow morning.</h2>
-            <p className="text-sec" style={{fontSize:'15px',marginBottom:'28px',lineHeight:1.6}}>3 days free. No credit card. 20 founding spots at $15/month forever.</p>
+            <p className="text-sec" style={{fontSize:'15px',marginBottom:'28px',lineHeight:1.6}}>3 days free. No credit card. 20 founding spots at $19/month forever.</p>
             <a href="#signup" className="li-btn" style={{fontSize:'16px',padding:'12px 32px'}}>Start My Free 3-Day Trial →</a>
           </div>
         </div>
