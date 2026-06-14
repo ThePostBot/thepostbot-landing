@@ -14,8 +14,7 @@ const FAQS = [
   {q:'Is the founding price locked forever?',a:'Yes. Founding members who join now lock in the founding price for the lifetime of their subscription. After the 20 founding spots are gone the standard price applies.'},
 ];
 
-const MONTHLY_URL = 'https://checkout.dodopayments.com/buy/pdt_0NgxTm1CbxtKFGQH3Aal5?quantity=1';
-const YEARLY_URL = 'https://checkout.dodopayments.com/buy/pdt_0NgxTzuVqyHMHgMUT0rdV?quantity=1';
+
 
 export default function Home() {
   const router = useRouter();
@@ -53,7 +52,6 @@ export default function Home() {
   const inp=k=>({width:'100%',background:focused===k?'#fff':'#F9F8F5',border:`1px solid ${focused===k?'#0A66C2':'rgba(0,0,0,0.2)'}`,borderRadius:'4px',padding:'10px 12px',color:'rgba(0,0,0,0.9)',fontSize:'14px',fontFamily:"'Source Sans Pro',sans-serif",outline:'none',transition:'all 0.15s',appearance:'none',WebkitAppearance:'none',boxSizing:'border-box',boxShadow:focused===k?'0 0 0 1px #0A66C2':'none'});
 
   const mp=19,yp=180,ym=Math.round(yp/12),yd=Math.round((1-yp/(mp*12))*100);
-  const checkoutUrl = billing === 'monthly' ? MONTHLY_URL : YEARLY_URL;
 
   return(<>
     <Head>
@@ -339,7 +337,7 @@ export default function Home() {
                 </div>
                 {billing==='yearly'&&<p style={{color:'#057642',fontSize:'13px',fontWeight:600,marginBottom:'4px'}}>Billed ${yp}/year · Save ${mp*12-yp}/year</p>}
                 <p className="text-mut" style={{fontSize:'12px',marginBottom:'18px'}}>{billing==='monthly'?'Billed monthly · Cancel anytime':'Billed once per year · Cancel anytime'}</p>
-                <a href={checkoutUrl} target="_blank" rel="noopener noreferrer" className="li-btn" style={{display:'flex',justifyContent:'center',width:'100%',marginBottom:'20px',animation:'none'}}>
+                <a href="#signup" className="li-btn" style={{display:'flex',justifyContent:'center',width:'100%',marginBottom:'20px',animation:'none'}}>
                   {billing==='monthly'?'Claim Founding Price →':'Claim Yearly Deal →'}
                 </a>
                 {['3 AI posts in your inbox daily','News-based & country-specific','Different format every day','Matching images included','Price locked for founding members','3-day free trial to start'].map(f=>(
