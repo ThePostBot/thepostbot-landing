@@ -55,6 +55,7 @@ export default function Home() {
 
   return(<>
     <Head>
+      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
       <title>ThePostBot — 3 LinkedIn Posts in Your Inbox Every Morning</title>
       <meta name="description" content="AI-written LinkedIn posts delivered to your inbox every morning." />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
