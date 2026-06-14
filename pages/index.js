@@ -338,7 +338,7 @@ export default function Home() {
                 {billing==='yearly'&&<p style={{color:'#057642',fontSize:'13px',fontWeight:600,marginBottom:'4px'}}>Billed ${yp}/year · Save ${mp*12-yp}/year</p>}
                 <p className="text-mut" style={{fontSize:'12px',marginBottom:'18px'}}>{billing==='monthly'?'Billed monthly · Cancel anytime':'Billed once per year · Cancel anytime'}</p>
                 <a href="#signup" className="li-btn" style={{display:'flex',justifyContent:'center',width:'100%',marginBottom:'20px',animation:'none'}}>
-                  {billing==='monthly'?'Claim Founding Price →':'Claim Yearly Deal →'}
+                  {billing==='monthly'?'Start Free Trial →':'Start Free Trial →'}
                 </a>
                 {['3 AI posts in your inbox daily','News-based & country-specific','Different format every day','Matching images included','Price locked for founding members','3-day free trial to start'].map(f=>(
                   <div key={f} style={{display:'flex',gap:'8px',marginBottom:'9px',alignItems:'flex-start'}}>
