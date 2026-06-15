@@ -7,6 +7,7 @@ export default async function handler(req, res) {
 
   const { name, email, niche, tone, country, keyword } = req.body;
 
+  // Basic validation
   if (!name || !email || !niche || !tone || !country) {
     return res.status(400).json({ error: 'All fields are required' });
   }
@@ -16,10 +17,16 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid email address' });
   }
 
+  // Sanitize inputs
+  const cleanName = name.trim().slice(0, 100);
+  const cleanEmail = email.trim().toLowerCase();
+  const cleanKeyword = keyword ? keyword.trim().slice(0, 100) : '';
+
   try {
 
+    // CHECK IF EMAIL ALREADY EXISTS IN AIRTABLE
     const searchRes = await fetch(
-      `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Subscribers?filterByFormula=${encodeURIComponent(`{Email}="${email}"`)}`,
+      `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Subscribers?filterByFormula=${encodeURIComponent(`{Email}="${cleanEmail}"`)}`,
       {
         headers: {
           Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}`,
@@ -27,14 +34,20 @@ export default async function handler(req, res) {
       }
     );
 
+    if (!searchRes.ok) {
+      console.error('Airtable search failed:', searchRes.status);
+      return res.status(500).json({ error: 'Something went wrong. Please try again.' });
+    }
+
     const searchData = await searchRes.json();
 
     if (searchData.records && searchData.records.length > 0) {
-      const status = searchData.records[0].fields.Status;
+      const existing = searchData.records[0].fields;
+      const status = existing.Status;
 
       if (status === 'trial') {
         return res.status(400).json({
-          error: 'You already have an active free trial. Check your inbox every morning for your 3 posts!'
+          error: 'You already have an active free trial! Check your inbox every morning for your 3 posts. Posts arrive daily at 7am UAE time.'
         });
       }
 
@@ -44,22 +57,33 @@ export default async function handler(req, res) {
         });
       }
 
-      if (status === 'expired' || status === 'cancelled') {
+      if (status === 'expired') {
         return res.status(400).json({
-          error: 'You have already used your free trial. To continue receiving your daily LinkedIn posts, please subscribe at $19/month using the link in your trial expired email, or contact us at hello@thepostbot.me'
+          error: 'Your free trial has ended. To continue receiving posts, please subscribe at $19/month. Check your trial expired email for the upgrade link, or email us at hello@thepostbot.me'
         });
       }
+
+      if (status === 'cancelled') {
+        return res.status(400).json({
+          error: 'Your subscription was cancelled. To reactivate, please email us at hello@thepostbot.me and we will get you set up again.'
+        });
+      }
+
+      // Catch any other status we haven't handled
+      return res.status(400).json({
+        error: 'An account with this email already exists. Please email hello@thepostbot.me if you need help.'
+      });
     }
 
-    // NEW USER — Save to Airtable
+    // NEW USER — create Airtable record
     const today = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Dubai" }));
     const trialEnd = new Date(today);
     trialEnd.setDate(today.getDate() + 3);
     const formatDate = (d) => d.toISOString().split('T')[0];
 
     const fields = {
-      Name: name,
-      Email: email,
+      Name: cleanName,
+      Email: cleanEmail,
       Niche: niche,
       Tone: tone,
       Country: country,
@@ -69,8 +93,8 @@ export default async function handler(req, res) {
       'Trial End Date': formatDate(trialEnd),
     };
 
-    if (keyword && keyword.trim()) {
-      fields['Keyword'] = keyword.trim();
+    if (cleanKeyword) {
+      fields['Keyword'] = cleanKeyword;
     }
 
     const createRes = await fetch(
@@ -88,27 +112,28 @@ export default async function handler(req, res) {
     const createData = await createRes.json();
 
     if (!createRes.ok) {
-      console.error('Airtable error:', JSON.stringify(createData));
-      return res.status(500).json({ error: 'Failed to save signup. Please try again.' });
+      console.error('Airtable create error:', JSON.stringify(createData));
+      return res.status(500).json({ error: 'Failed to create your account. Please try again.' });
     }
 
-    // TRIGGER INSTANT POST GENERATION
-    try {
-      await fetch(process.env.MAKE_INSTANT_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          name,
-          niche,
-          tone,
-          country,
-          keyword: keyword || ''
-        }),
-      });
-    } catch (webhookErr) {
-      // Non-fatal — user is saved, posts will arrive tomorrow if webhook fails
-      console.error('Instant webhook error:', webhookErr);
+    // TRIGGER INSTANT POST GENERATION — non-fatal if fails
+    if (process.env.MAKE_INSTANT_WEBHOOK_URL) {
+      try {
+        await fetch(process.env.MAKE_INSTANT_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: cleanEmail,
+            name: cleanName,
+            niche,
+            tone,
+            country,
+            keyword: cleanKeyword
+          }),
+        });
+      } catch (webhookErr) {
+        console.error('Instant webhook error (non-fatal):', webhookErr);
+      }
     }
 
     // SEND WELCOME EMAIL
@@ -124,7 +149,7 @@ export default async function handler(req, res) {
 
     await transporter.sendMail({
       from: '"ThePostBot" <hello@thepostbot.me>',
-      to: email,
+      to: cleanEmail,
       subject: `Welcome to ThePostBot! Your first posts arrive today 🚀`,
       html: `<!DOCTYPE html>
 <html>
@@ -139,7 +164,7 @@ export default async function handler(req, res) {
 
   <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:8px;padding:36px;box-shadow:0 1px 4px rgba(0,0,0,0.04);">
     <div style="text-align:center;font-size:40px;margin-bottom:16px;">🎉</div>
-    <h2 style="color:rgba(0,0,0,0.9);font-size:22px;text-align:center;margin:0 0 10px;font-family:Arial,sans-serif;font-weight:700;">Welcome, ${name}!</h2>
+    <h2 style="color:rgba(0,0,0,0.9);font-size:22px;text-align:center;margin:0 0 10px;font-family:Arial,sans-serif;font-weight:700;">Welcome, ${cleanName}!</h2>
     <p style="color:rgba(0,0,0,0.55);font-size:15px;text-align:center;line-height:1.7;margin:0 0 24px;font-family:Arial,sans-serif;">You are officially a ThePostBot Founding Member.<br/>Your 3-day free trial has started. Your first posts arrive <strong style="color:rgba(0,0,0,0.85);">today.</strong></p>
 
     <div style="background:#F9F8F5;border:1px solid rgba(0,0,0,0.08);border-radius:8px;padding:20px;margin-bottom:20px;">
@@ -171,7 +196,7 @@ export default async function handler(req, res) {
       <p style="color:rgba(0,0,0,0.5);font-size:12px;margin:0 0 6px;font-family:Arial,sans-serif;">Your personalisation</p>
       <p style="color:rgba(0,0,0,0.85);font-size:14px;margin:0;font-family:Arial,sans-serif;line-height:1.8;">
         <strong style="color:#0A66C2;">Niche:</strong> ${niche} &nbsp;·&nbsp; <strong style="color:#0A66C2;">Tone:</strong> ${tone}<br/>
-        <strong style="color:#0A66C2;">Country:</strong> ${country}${keyword ? ` &nbsp;·&nbsp; <strong style="color:#0A66C2;">Topic:</strong> ${keyword}` : ''}
+        <strong style="color:#0A66C2;">Country:</strong> ${country}${cleanKeyword ? ` &nbsp;·&nbsp; <strong style="color:#0A66C2;">Topic:</strong> ${cleanKeyword}` : ''}
       </p>
     </div>
 
@@ -193,6 +218,6 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Server error:', error);
-    return res.status(500).json({ error: 'Server error. Please try again.' });
+    return res.status(500).json({ error: 'Server error. Please try again in a moment.' });
   }
 }
