@@ -413,7 +413,7 @@ export default function Home() {
           <div className="li-card" style={{padding:'clamp(20px,5vw,36px)',boxShadow:'0 0 0 1px rgba(0,0,0,0.08),0 4px 20px rgba(0,0,0,0.08)'}}>
             <div style={{display:'grid',gap:'16px'}}>
               <div className="grid-2" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'14px'}}>
-                {[['name','Full Name','text','Your name'],['email','Email','email','you@company.com']].map(([k,l,t,p])=>(
+                {[['name','Full Name','text','Your name'],['email','Email','email','you@email.com']].map(([k,l,t,p])=>(
                   <div key={k}>
                     <label style={{display:'block',color:'rgba(0,0,0,0.6)',fontSize:'13px',fontWeight:600,marginBottom:'5px'}}>{l}</label>
                     <input type={t} placeholder={p} value={form[k]} onChange={e=>setForm({...form,[k]:e.target.value})} onFocus={()=>setFocused(k)} onBlur={()=>setFocused(null)} style={inp(k)}/>
