@@ -5,20 +5,30 @@ import { useRouter } from 'next/router';
 const COUNTRIES = ['Afghanistan','Albania','Algeria','Andorra','Angola','Antigua and Barbuda','Argentina','Armenia','Australia','Austria','Azerbaijan','Bahamas','Bahrain','Bangladesh','Barbados','Belarus','Belgium','Belize','Benin','Bhutan','Bolivia','Bosnia and Herzegovina','Botswana','Brazil','Brunei','Bulgaria','Burkina Faso','Burundi','Cabo Verde','Cambodia','Cameroon','Canada','Central African Republic','Chad','Chile','China','Colombia','Comoros','Congo','Costa Rica','Croatia','Cuba','Cyprus','Czech Republic','Denmark','Djibouti','Dominica','Dominican Republic','Ecuador','Egypt','El Salvador','Equatorial Guinea','Eritrea','Estonia','Eswatini','Ethiopia','Fiji','Finland','France','Gabon','Gambia','Georgia','Germany','Ghana','Greece','Grenada','Guatemala','Guinea','Guinea-Bissau','Guyana','Haiti','Honduras','Hungary','Iceland','India','Indonesia','Iran','Iraq','Ireland','Israel','Italy','Jamaica','Japan','Jordan','Kazakhstan','Kenya','Kiribati','Kuwait','Kyrgyzstan','Laos','Latvia','Lebanon','Lesotho','Liberia','Libya','Liechtenstein','Lithuania','Luxembourg','Madagascar','Malawi','Malaysia','Maldives','Mali','Malta','Marshall Islands','Mauritania','Mauritius','Mexico','Micronesia','Moldova','Monaco','Mongolia','Montenegro','Morocco','Mozambique','Myanmar','Namibia','Nauru','Nepal','Netherlands','New Zealand','Nicaragua','Niger','Nigeria','North Korea','North Macedonia','Norway','Oman','Pakistan','Palau','Palestine','Panama','Papua New Guinea','Paraguay','Peru','Philippines','Poland','Portugal','Qatar','Romania','Russia','Rwanda','Saint Kitts and Nevis','Saint Lucia','Saint Vincent and the Grenadines','Samoa','San Marino','Sao Tome and Principe','Saudi Arabia','Senegal','Serbia','Seychelles','Sierra Leone','Singapore','Slovakia','Slovenia','Solomon Islands','Somalia','South Africa','South Korea','South Sudan','Spain','Sri Lanka','Sudan','Suriname','Sweden','Switzerland','Syria','Taiwan','Tajikistan','Tanzania','Thailand','Timor-Leste','Togo','Tonga','Trinidad and Tobago','Tunisia','Turkey','Turkmenistan','Tuvalu','Uganda','Ukraine','United Arab Emirates','United Kingdom','United States','Uruguay','Uzbekistan','Vanuatu','Vatican City','Venezuela','Vietnam','Yemen','Zambia','Zimbabwe'];
 const NICHES = ['Marketing & Advertising','Sales & Business Development','Technology & SaaS','Finance & Investing','Entrepreneurship & Startups','Leadership & Management','Human Resources & Talent','Real Estate','Healthcare & Wellness','E-commerce & Retail','Personal Branding','Productivity & Self-Development','Consulting & Coaching','Legal & Compliance','Supply Chain & Logistics'];
 const TONES = ['Professional & Authoritative','Conversational & Friendly','Bold & Provocative','Inspirational & Motivating','Data-Driven & Analytical','Storytelling & Personal','Educational & Informative','Witty & Humorous'];
+const ROLES = ['Employee / Professional','Business Owner / Entrepreneur','Freelancer / Consultant','Student / Fresh Graduate','Job Seeker'];
+const AUDIENCES = ['Industry peers & professionals','Potential clients & customers','Recruiters & hiring managers','Junior professionals & students','General business audience','C-suite & decision makers'];
+const POST_STYLES = [
+  {id:'punchy',icon:'⚡',label:'Punchy',desc:'Short. Direct. One idea. Max impact.'},
+  {id:'storytelling',icon:'📖',label:'Storytelling',desc:'Personal narrative with a lesson.'},
+  {id:'educational',icon:'🎓',label:'Educational',desc:'Teach something. Lists & frameworks.'},
+  {id:'provocative',icon:'🔥',label:'Provocative',desc:'Challenge assumptions. Start debate.'},
+];
 const FAQS = [
   {q:'What happens after the 3-day free trial?',a:'Your posts pause automatically. You receive an email with a link to subscribe. No credit card is taken during the trial — ever.'},
-  {q:'How do I post to LinkedIn?',a:'You receive 3 posts in your email inbox each morning. Copy the post you like most and paste it directly into LinkedIn. That is your entire workflow — no app, no login, no scheduling tool needed.'},
-  {q:'Can I change my niche or tone after signing up?',a:'Yes. Reply to any email with your updated niche or tone and we will update your profile within 24 hours.'},
+  {q:'How do I post to LinkedIn?',a:'You receive 3 posts in your email inbox. Copy the post you like most and paste it directly into LinkedIn. That is your entire workflow — no app, no login, no scheduling tool needed.'},
+  {q:'Can I change my niche or tone after signing up?',a:'Yes. Reply to any email with your updated details and we will update your profile within 24 hours.'},
   {q:'What if I do not like a post?',a:'Simply ignore it. You get 3 every morning — pick the one that resonates. If none of the 3 work consistently, email us and we will tune your profile.'},
   {q:'What is the difference between monthly and yearly?',a:'Monthly gives you full flexibility at $19/month. Yearly saves you over 21% — paying $180/year instead of $228. Both plans include identical features.'},
   {q:'Is the founding price locked forever?',a:'Yes. Founding members who join now lock in the founding price for the lifetime of their subscription. After the 20 founding spots are gone the standard price applies.'},
 ];
 
-
-
 export default function Home() {
   const router = useRouter();
-  const [form, setForm] = useState({name:'',email:'',country:'',niche:'',tone:'',keyword:''});
+  const [step, setStep] = useState(1);
+  const [form, setForm] = useState({
+    salutation:'',name:'',email:'',country:'',niche:'',tone:'',keyword:'',
+    role:'',experience:'',audience:'',postStyle:'',opinion:''
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [focused, setFocused] = useState(null);
@@ -36,9 +46,22 @@ export default function Home() {
   const r = id=>el=>{refs.current[id]=el;if(el)el.dataset.id=id;};
   const fade = id=>({opacity:visible[id]?1:0,transform:visible[id]?'translateY(0)':'translateY(20px)',transition:'opacity 0.55s ease,transform 0.55s ease'});
 
-  const submit = async e=>{
-    e.preventDefault();setError('');
-    if(!form.name||!form.email||!form.country||!form.niche||!form.tone){setError('Please fill in all required fields.');return;}
+  const nextStep = ()=>{
+    setError('');
+    if(!form.name||!form.email||!form.country||!form.niche||!form.tone){
+      setError('Please fill in all required fields.');return;
+    }
+    const emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!emailRegex.test(form.email)){setError('Please enter a valid email address.');return;}
+    setStep(2);
+    window.scrollTo({top:document.getElementById('signup').offsetTop-80,behavior:'smooth'});
+  };
+
+  const submit = async()=>{
+    setError('');
+    if(!form.role||!form.audience||!form.postStyle){
+      setError('Please complete all required fields in this section.');return;
+    }
     setLoading(true);
     try{
       const res=await fetch('/api/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...form,billing})});
@@ -49,16 +72,17 @@ export default function Home() {
     setLoading(false);
   };
 
-  const inp=k=>({width:'100%',background:focused===k?'#fff':'#F9F8F5',border:`1px solid ${focused===k?'#0A66C2':'rgba(0,0,0,0.2)'}`,borderRadius:'4px',padding:'10px 12px',color:'rgba(0,0,0,0.9)',fontSize:'14px',fontFamily:"'Source Sans Pro',sans-serif",outline:'none',transition:'all 0.15s',appearance:'none',WebkitAppearance:'none',boxSizing:'border-box',boxShadow:focused===k?'0 0 0 1px #0A66C2':'none'});
+  const inp=k=>({width:'100%',background:focused===k?'#fff':'#F9F8F5',border:`1px solid ${focused===k?'#0A66C2':'rgba(0,0,0,0.2)'}`,borderRadius:'6px',padding:'10px 12px',color:'rgba(0,0,0,0.9)',fontSize:'14px',fontFamily:"'Source Sans Pro',sans-serif",outline:'none',transition:'all 0.15s',appearance:'none',WebkitAppearance:'none',boxSizing:'border-box',boxShadow:focused===k?'0 0 0 1px #0A66C2':'none'});
+  const lbl=(text,required=true)=><label style={{display:'block',color:'rgba(0,0,0,0.6)',fontSize:'13px',fontWeight:600,marginBottom:'5px'}}>{text}{!required&&<span style={{color:'rgba(0,0,0,0.35)',fontWeight:400}}> — optional</span>}</label>;
 
   const mp=19,yp=180,ym=Math.round(yp/12),yd=Math.round((1-yp/(mp*12))*100);
 
   return(<>
     <Head>
-      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-      <title>ThePostBot — 3 LinkedIn Posts in Your Inbox Every Morning</title>
-      <meta name="description" content="AI-written LinkedIn posts delivered to your inbox every morning." />
+      <title>ThePostBot — 3 LinkedIn Posts in Your Inbox Every Day</title>
+      <meta name="description" content="AI-written LinkedIn posts delivered to your inbox every day — based on today's news, in your tone, for your niche." />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
@@ -87,7 +111,7 @@ export default function Home() {
       .blue{color:#0A66C2;}.text-sec{color:rgba(0,0,0,0.6);}.text-mut{color:rgba(0,0,0,0.42);}
       .container{max-width:1080px;margin:0 auto;padding:0 24px;}
       .container-sm{max-width:720px;margin:0 auto;padding:0 24px;}
-      .container-xs{max-width:560px;margin:0 auto;padding:0 24px;}
+      .container-xs{max-width:640px;margin:0 auto;padding:0 24px;}
       .section{padding:64px 0;}.section-alt{padding:64px 0;background:#fff;border-top:1px solid rgba(0,0,0,0.08);border-bottom:1px solid rgba(0,0,0,0.08);}
       .live-dot{width:7px;height:7px;border-radius:50%;background:#057642;box-shadow:0 0 6px rgba(5,118,66,0.6);animation:pulse 2s infinite;display:inline-block;margin-right:5px;}
       .feat-card{background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:8px;padding:20px;transition:all 0.2s;}
@@ -118,6 +142,17 @@ export default function Home() {
       .billing-toggle{display:inline-flex;background:#F3F2EE;border:1px solid rgba(0,0,0,0.1);border-radius:20px;padding:3px;}
       .billing-opt{padding:6px 18px;border-radius:16px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;border:none;background:transparent;font-family:'Source Sans Pro',sans-serif;color:rgba(0,0,0,0.5);}
       .billing-opt.active{background:#fff;color:#0A66C2;box-shadow:0 1px 4px rgba(0,0,0,0.1);}
+      .sal-btn{padding:7px 16px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;border:1.5px solid rgba(0,0,0,0.15);background:transparent;font-family:'Source Sans Pro',sans-serif;color:rgba(0,0,0,0.5);}
+      .sal-btn.active{background:#EBF3FB;border-color:#0A66C2;color:#0A66C2;}
+      .style-card{border:1.5px solid rgba(0,0,0,0.12);border-radius:8px;padding:12px 14px;cursor:pointer;transition:all 0.15s;background:#F9F8F5;}
+      .style-card.active{border-color:#0A66C2;background:#EBF3FB;}
+      .step-indicator{display:flex;align-items:center;gap:8px;margin-bottom:20px;}
+      .step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;transition:all 0.2s;}
+      .step-dot.done{background:#0A66C2;color:#fff;}
+      .step-dot.active{background:#0A66C2;color:#fff;box-shadow:0 0 0 3px rgba(10,102,194,0.2);}
+      .step-dot.pending{background:#F3F2EE;color:rgba(0,0,0,0.35);border:1.5px solid rgba(0,0,0,0.12);}
+      .step-line{flex:1;height:2px;background:rgba(0,0,0,0.08);}
+      .step-line.done{background:#0A66C2;}
       select option{background:#fff;color:rgba(0,0,0,0.9);}
       @media(max-width:768px){
         .hide-mob{display:none!important;}
@@ -126,6 +161,7 @@ export default function Home() {
         .grid-price{grid-template-columns:1fr!important;}
         .mock-body{flex-direction:column!important;}
         .steps-grid{grid-template-columns:1fr!important;}
+        .style-grid{grid-template-columns:1fr 1fr!important;}
       }
       @media(max-width:480px){.stats-grid{grid-template-columns:1fr 1fr!important;}}
     `}</style>
@@ -170,7 +206,7 @@ export default function Home() {
             Your LinkedIn posts<br/><span className="blue">wake up before you do</span>
           </h1>
           <p className="a3 text-sec" style={{fontSize:'18px',lineHeight:1.65,maxWidth:'520px',margin:'0 auto 32px',fontWeight:400}}>
-            Every morning, 3 AI-written posts land in your inbox — based on today's news, in your tone, for your niche.{' '}
+            Every day, 3 AI-written posts land in your inbox — based on today's news, in your tone, for your niche.{' '}
             <strong style={{color:'rgba(0,0,0,0.8)',fontWeight:600}}>Pick one. Paste. Done.</strong>
           </p>
           <div className="a4" style={{display:'flex',gap:'12px',justifyContent:'center',flexWrap:'wrap',marginBottom:'12px'}}>
@@ -206,7 +242,7 @@ export default function Home() {
                 ))}
               </div>
             </div>
-            <p style={{fontSize:'12px',color:'rgba(0,0,0,0.35)',marginTop:'10px'}}>↑ This arrives in your inbox every morning. 3 formats, 3 angles, every day.</p>
+            <p style={{fontSize:'12px',color:'rgba(0,0,0,0.35)',marginTop:'10px'}}>↑ This arrives in your inbox every day. 3 formats, 3 angles, every day.</p>
           </div>
         </div>
       </section>
@@ -215,7 +251,7 @@ export default function Home() {
       <div style={{background:'#fff',borderTop:'1px solid rgba(0,0,0,0.08)',borderBottom:'1px solid rgba(0,0,0,0.08)',padding:'20px 24px'}}>
         <div className="container">
           <div className="stats-grid" style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'16px',textAlign:'center'}}>
-            {[['3','posts every morning'],['3 days','free trial — no card'],['$19','founding price / month'],['0','effort from you']].map(([v,l])=>(
+            {[['3','posts every day'],['3 days','free trial — no card'],['$19','founding price / month'],['0','effort from you']].map(([v,l])=>(
               <div key={l}>
                 <div style={{fontWeight:700,fontSize:'1.7rem',color:'#0A66C2',lineHeight:1}}>{v}</div>
                 <div style={{fontSize:'12px',color:'rgba(0,0,0,0.5)',marginTop:'4px'}}>{l}</div>
@@ -230,12 +266,12 @@ export default function Home() {
         <div className="container" ref={r('how')}>
           <div style={{textAlign:'center',marginBottom:'36px',...fade('how')}}>
             <div className="li-label">How it works</div>
-            <h2 className="h2">Set up once. Posts arrive every morning.</h2>
+            <h2 className="h2">Set up once. Posts arrive every day.</h2>
           </div>
           <div className="steps-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px',maxWidth:'720px',margin:'0 auto'}}>
             {[
-              {n:'1',t:'Tell us about yourself',d:'Select your niche, tone, and country. Add an optional keyword. 30 seconds. You never do it again.'},
-              {n:'2',t:'AI writes while you sleep',d:'Every night our AI scans trending news in your industry and country, then writes 3 posts in your exact tone.'},
+              {n:'1',t:'Tell us about yourself',d:'Select your niche, tone, and country. Share your style and who you write for. Takes 2 minutes. You never do it again.'},
+              {n:'2',t:'AI writes while you sleep',d:'Every night our AI scans trending news in your industry and country, then writes 3 posts in your exact voice.'},
               {n:'3',t:'3 posts land in your inbox',d:'Wake up to 3 ready-to-use LinkedIn posts — a hot take, a data insight, and a personal story. All fresh, all different.'},
               {n:'4',t:'Copy. Paste. Done.',d:'Open your email, pick the post you like, copy it, paste to LinkedIn. Your whole workflow is 10 seconds.'},
             ].map(s=>(
@@ -261,7 +297,7 @@ export default function Home() {
           <div className="grid-2" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',maxWidth:'700px',margin:'0 auto'}}>
             {[
               {label:'✗ Without ThePostBot',lc:'#B24020',items:['Staring at a blank page every morning','No idea what to write about today','Writing takes 30–60 minutes per post','Posts feel generic and forgettable','Skip posting some days entirely','LinkedIn presence: inconsistent']},
-              {label:'✓ With ThePostBot',lc:'#057642',items:['3 posts ready before you open your eyes',"Based on today's real trending news",'10 seconds to choose and post','Different format and angle every day','Post every single day consistently','LinkedIn presence: unstoppable']},
+              {label:'✓ With ThePostBot',lc:'#057642',items:['3 posts ready before you open your eyes',"Based on today's real trending news",'10 seconds to choose and post','Written in your voice, for your audience','Post every single day consistently','LinkedIn presence: unstoppable']},
             ].map(col=>(
               <div key={col.label} className="ba-card" style={{borderLeft:`3px solid ${col.lc}`}}>
                 <p style={{color:col.lc,fontWeight:700,fontSize:'12px',marginBottom:'14px',textTransform:'uppercase',letterSpacing:'0.06em'}}>{col.label}</p>
@@ -287,8 +323,8 @@ export default function Home() {
           </div>
           <div className="feat-grid" style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'10px'}}>
             {[
-              {e:'📬',t:'Arrives before you wake up',d:'3 posts in your inbox every morning. No app to open, no prompts to write.'},
-              {e:'🎯',t:'Sounds exactly like you',d:'Set your tone once — professional, bold, witty — and every post matches it.'},
+              {e:'📬',t:'Arrives before you wake up',d:'3 posts in your inbox every day. No app to open, no prompts to write.'},
+              {e:'🎯',t:'Written in your voice',d:'We learn your style, your audience, your opinions. Every post sounds like you.'},
               {e:'📰',t:"Today's news, every day",d:"Posts based on what's trending in your country and niche. Never recycled."},
               {e:'🌍',t:'Country-specific content',d:'UAE gets UAE news. Pakistan gets Pakistan business news. Locally relevant.'},
               {e:'🖼️',t:'Images always included',d:'Every post comes with a matching AI-generated image. No extra steps needed.'},
@@ -339,9 +375,9 @@ export default function Home() {
                 {billing==='yearly'&&<p style={{color:'#057642',fontSize:'13px',fontWeight:600,marginBottom:'4px'}}>Billed ${yp}/year · Save ${mp*12-yp}/year</p>}
                 <p className="text-mut" style={{fontSize:'12px',marginBottom:'18px'}}>{billing==='monthly'?'Billed monthly · Cancel anytime':'Billed once per year · Cancel anytime'}</p>
                 <a href="#signup" className="li-btn" style={{display:'flex',justifyContent:'center',width:'100%',marginBottom:'20px',animation:'none'}}>
-                  {billing==='monthly'?'Start Free Trial →':'Start Free Trial →'}
+                  {billing==='monthly'?'Start Free Trial →':'Claim Yearly Deal →'}
                 </a>
-                {['3 AI posts in your inbox daily','News-based & country-specific','Different format every day','Matching images included','Price locked for founding members','3-day free trial to start'].map(f=>(
+                {['3 AI posts in your inbox daily','Written in your voice, for your audience','News-based & country-specific','Matching images included','Price locked for founding members','3-day free trial to start'].map(f=>(
                   <div key={f} style={{display:'flex',gap:'8px',marginBottom:'9px',alignItems:'flex-start'}}>
                     <div className="li-check"><span style={{fontSize:'10px',color:'#0A66C2',fontWeight:700}}>✓</span></div>
                     <span style={{fontSize:'14px',color:'rgba(0,0,0,0.75)'}}>{f}</span>
@@ -358,7 +394,7 @@ export default function Home() {
               {billing==='yearly'&&<p style={{color:'rgba(0,0,0,0.25)',fontSize:'13px',marginBottom:'4px'}}>Billed $288/year</p>}
               <p style={{color:'rgba(0,0,0,0.25)',fontSize:'12px',marginBottom:'18px'}}>Available after founding spots fill</p>
               <div style={{background:'#F3F2EE',border:'1px solid rgba(0,0,0,0.08)',borderRadius:'20px',padding:'10px',textAlign:'center',color:'rgba(0,0,0,0.3)',fontSize:'13px',fontWeight:600,marginBottom:'20px'}}>Coming after founding spots fill</div>
-              {['3 AI posts in your inbox daily','News-based & country-specific','Different format every day','Matching images included','Standard support','3-day free trial to start'].map(f=>(
+              {['3 AI posts in your inbox daily','Written in your voice, for your audience','News-based & country-specific','Matching images included','Standard support','3-day free trial to start'].map(f=>(
                 <div key={f} style={{display:'flex',gap:'8px',marginBottom:'9px',alignItems:'flex-start'}}>
                   <div style={{width:'18px',height:'18px',borderRadius:'50%',background:'#F3F2EE',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,marginTop:'1px'}}>
                     <span style={{fontSize:'10px',color:'rgba(0,0,0,0.22)',fontWeight:700}}>✓</span>
@@ -395,72 +431,178 @@ export default function Home() {
         <div className="container-sm" style={{textAlign:'center'}} ref={r('cta')}>
           <div style={fade('cta')}>
             <div className="li-label">Still thinking?</div>
-            <h2 className="h2" style={{marginBottom:'12px'}}>Your first posts arrive tomorrow morning.</h2>
+            <h2 className="h2" style={{marginBottom:'12px'}}>Your first posts arrive today.</h2>
             <p className="text-sec" style={{fontSize:'15px',marginBottom:'28px',lineHeight:1.6}}>3 days free. No credit card. 20 founding spots at $19/month forever.</p>
             <a href="#signup" className="li-btn" style={{fontSize:'16px',padding:'12px 32px'}}>Start My Free 3-Day Trial →</a>
           </div>
         </div>
       </section>
 
-      {/* SIGNUP */}
+      {/* SIGNUP — TWO STEP */}
       <section id="signup" className="section">
         <div className="container-xs" ref={r('signup')}>
           <div style={{textAlign:'center',marginBottom:'28px',...fade('signup')}}>
             <div className="li-label">Start Free Trial</div>
             <h2 className="h2" style={{marginBottom:'8px'}}>Wake up to a better feed</h2>
-            <p className="text-sec" style={{fontSize:'15px'}}>Tell us about you. Your first posts land tomorrow morning.</p>
+            <p className="text-sec" style={{fontSize:'15px'}}>Tell us about you — your first posts arrive today.</p>
           </div>
+
           <div className="li-card" style={{padding:'clamp(20px,5vw,36px)',boxShadow:'0 0 0 1px rgba(0,0,0,0.08),0 4px 20px rgba(0,0,0,0.08)'}}>
-            <div style={{display:'grid',gap:'16px'}}>
-              <div className="grid-2" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'14px'}}>
-                {[['name','Full Name','text','Your name'],['email','Email','email','you@email.com']].map(([k,l,t,p])=>(
-                  <div key={k}>
-                    <label style={{display:'block',color:'rgba(0,0,0,0.6)',fontSize:'13px',fontWeight:600,marginBottom:'5px'}}>{l}</label>
-                    <input type={t} placeholder={p} value={form[k]} onChange={e=>setForm({...form,[k]:e.target.value})} onFocus={()=>setFocused(k)} onBlur={()=>setFocused(null)} style={inp(k)}/>
-                  </div>
-                ))}
-              </div>
-              <div>
-                <label style={{display:'block',color:'rgba(0,0,0,0.6)',fontSize:'13px',fontWeight:600,marginBottom:'5px'}}>Your Country</label>
-                <div style={{position:'relative'}}>
-                  <select value={form.country} onChange={e=>setForm({...form,country:e.target.value})} onFocus={()=>setFocused('country')} onBlur={()=>setFocused(null)} style={{...inp('country'),cursor:'pointer',color:form.country?'rgba(0,0,0,0.9)':'rgba(0,0,0,0.38)'}}>
-                    <option value="" disabled>Select your country</option>
-                    {COUNTRIES.map(c=><option key={c} value={c}>{c}</option>)}
-                  </select>
-                  <span style={{position:'absolute',right:'10px',top:'50%',transform:'translateY(-50%)',color:'rgba(0,0,0,0.3)',pointerEvents:'none',fontSize:'10px'}}>▾</span>
-                </div>
-              </div>
-              <div className="grid-2" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'14px'}}>
-                {[['niche','Your Niche',NICHES,'Select your industry'],['tone','Writing Tone',TONES,'Select your tone']].map(([k,l,opts,p])=>(
-                  <div key={k}>
-                    <label style={{display:'block',color:'rgba(0,0,0,0.6)',fontSize:'13px',fontWeight:600,marginBottom:'5px'}}>{l}</label>
-                    <div style={{position:'relative'}}>
-                      <select value={form[k]} onChange={e=>setForm({...form,[k]:e.target.value})} onFocus={()=>setFocused(k)} onBlur={()=>setFocused(null)} style={{...inp(k),cursor:'pointer',color:form[k]?'rgba(0,0,0,0.9)':'rgba(0,0,0,0.38)'}}>
-                        <option value="" disabled>{p}</option>
-                        {opts.map(o=><option key={o} value={o}>{o}</option>)}
-                      </select>
-                      <span style={{position:'absolute',right:'10px',top:'50%',transform:'translateY(-50%)',color:'rgba(0,0,0,0.3)',pointerEvents:'none',fontSize:'10px'}}>▾</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div>
-                <label style={{display:'block',color:'rgba(0,0,0,0.6)',fontSize:'13px',fontWeight:600,marginBottom:'5px'}}>
-                  Topic / Keyword <span style={{color:'rgba(0,0,0,0.35)',fontWeight:400}}>— optional</span>
-                </label>
-                <input type="text" placeholder="e.g. AI, Dubai real estate, remote work..." value={form.keyword} onChange={e=>setForm({...form,keyword:e.target.value})} onFocus={()=>setFocused('keyword')} onBlur={()=>setFocused(null)} style={inp('keyword')}/>
-                <p style={{color:'rgba(0,0,0,0.35)',fontSize:'12px',marginTop:'4px'}}>Leave empty — we use today's trending news automatically</p>
-              </div>
-              {error&&<div style={{background:'#FDF0EB',border:'1px solid rgba(178,64,32,0.25)',color:'#B24020',padding:'10px 14px',borderRadius:'4px',fontSize:'14px'}}>{error}</div>}
-              <button onClick={submit} disabled={loading} style={{marginTop:'4px',background:loading?'#F3F2EE':'#0A66C2',color:loading?'rgba(0,0,0,0.35)':'#fff',border:`1.5px solid ${loading?'rgba(0,0,0,0.12)':'#0A66C2'}`,borderRadius:'20px',padding:'12px',fontFamily:"'Source Sans Pro',sans-serif",fontWeight:700,fontSize:'15px',cursor:loading?'not-allowed':'pointer',width:'100%',transition:'all 0.15s'}}
-                onMouseEnter={e=>{if(!loading)e.currentTarget.style.background='#004182';}}
-                onMouseLeave={e=>{if(!loading)e.currentTarget.style.background='#0A66C2';}}>
-                {loading?'Setting up your account…':'Start My Free 3-Day Trial →'}
-              </button>
-              <p style={{textAlign:'center',color:'rgba(0,0,0,0.38)',fontSize:'12px',lineHeight:1.8}}>
-                ✓ No credit card required &nbsp;·&nbsp; ✓ Cancel anytime &nbsp;·&nbsp; ✓ Posts arrive tomorrow morning
-              </p>
+
+            {/* STEP INDICATOR */}
+            <div className="step-indicator">
+              <div className={`step-dot ${step>=1?'done':''}`}>1</div>
+              <div className={`step-line ${step>=2?'done':''}`}/>
+              <div className={`step-dot ${step===2?'active':'pending'}`}>2</div>
             </div>
+
+            {step===1 && (
+              <div style={{display:'grid',gap:'16px'}}>
+                <p style={{color:'rgba(0,0,0,0.5)',fontSize:'13px',fontWeight:600,textTransform:'uppercase',letterSpacing:'0.06em'}}>Step 1 of 2 — The basics</p>
+
+                {/* SALUTATION */}
+                <div>
+                  {lbl('Title', false)}
+                  <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
+                    {['Mr','Mrs','Ms','Prefer not to say'].map(s=>(
+                      <button key={s} onClick={()=>setForm({...form,salutation:s})} className={`sal-btn ${form.salutation===s?'active':''}`}>{s}</button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* NAME + EMAIL */}
+                <div className="grid-2" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'14px'}}>
+                  {[['name','Full Name','text','Your name'],['email','Email','email','you@company.com']].map(([k,l,t,p])=>(
+                    <div key={k}>
+                      {lbl(l)}
+                      <input type={t} placeholder={p} value={form[k]} onChange={e=>setForm({...form,[k]:e.target.value})} onFocus={()=>setFocused(k)} onBlur={()=>setFocused(null)} style={inp(k)}/>
+                    </div>
+                  ))}
+                </div>
+
+                {/* COUNTRY */}
+                <div>
+                  {lbl('Your Country')}
+                  <div style={{position:'relative'}}>
+                    <select value={form.country} onChange={e=>setForm({...form,country:e.target.value})} onFocus={()=>setFocused('country')} onBlur={()=>setFocused(null)} style={{...inp('country'),cursor:'pointer',color:form.country?'rgba(0,0,0,0.9)':'rgba(0,0,0,0.38)'}}>
+                      <option value="" disabled>Select your country</option>
+                      {COUNTRIES.map(c=><option key={c} value={c}>{c}</option>)}
+                    </select>
+                    <span style={{position:'absolute',right:'10px',top:'50%',transform:'translateY(-50%)',color:'rgba(0,0,0,0.3)',pointerEvents:'none',fontSize:'10px'}}>▾</span>
+                  </div>
+                </div>
+
+                {/* NICHE + TONE */}
+                <div className="grid-2" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'14px'}}>
+                  {[['niche','Your Industry / Niche',NICHES,'Select your industry'],['tone','Writing Tone',TONES,'Select your tone']].map(([k,l,opts,p])=>(
+                    <div key={k}>
+                      {lbl(l)}
+                      <div style={{position:'relative'}}>
+                        <select value={form[k]} onChange={e=>setForm({...form,[k]:e.target.value})} onFocus={()=>setFocused(k)} onBlur={()=>setFocused(null)} style={{...inp(k),cursor:'pointer',color:form[k]?'rgba(0,0,0,0.9)':'rgba(0,0,0,0.38)'}}>
+                          <option value="" disabled>{p}</option>
+                          {opts.map(o=><option key={o} value={o}>{o}</option>)}
+                        </select>
+                        <span style={{position:'absolute',right:'10px',top:'50%',transform:'translateY(-50%)',color:'rgba(0,0,0,0.3)',pointerEvents:'none',fontSize:'10px'}}>▾</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* KEYWORD */}
+                <div>
+                  {lbl('Topic / Keyword', false)}
+                  <input type="text" placeholder="e.g. AI, Dubai real estate, remote work..." value={form.keyword} onChange={e=>setForm({...form,keyword:e.target.value})} onFocus={()=>setFocused('keyword')} onBlur={()=>setFocused(null)} style={inp('keyword')}/>
+                  <p style={{color:'rgba(0,0,0,0.35)',fontSize:'12px',marginTop:'4px'}}>Leave empty — we use today's trending news automatically</p>
+                </div>
+
+                {error&&<div style={{background:'#FDF0EB',border:'1px solid rgba(178,64,32,0.25)',color:'#B24020',padding:'10px 14px',borderRadius:'6px',fontSize:'14px'}}>{error}</div>}
+
+                <button onClick={nextStep} style={{marginTop:'4px',background:'#0A66C2',color:'#fff',border:'1.5px solid #0A66C2',borderRadius:'20px',padding:'12px',fontFamily:"'Source Sans Pro',sans-serif",fontWeight:700,fontSize:'15px',cursor:'pointer',width:'100%',transition:'all 0.15s'}}
+                  onMouseEnter={e=>{e.currentTarget.style.background='#004182';}}
+                  onMouseLeave={e=>{e.currentTarget.style.background='#0A66C2';}}>
+                  Next — Personalise Your Posts →
+                </button>
+                <p style={{textAlign:'center',color:'rgba(0,0,0,0.38)',fontSize:'12px',lineHeight:1.8}}>
+                  ✓ No credit card required &nbsp;·&nbsp; ✓ Cancel anytime &nbsp;·&nbsp; ✓ Posts arrive today
+                </p>
+              </div>
+            )}
+
+            {step===2 && (
+              <div style={{display:'grid',gap:'16px'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                  <button onClick={()=>{setStep(1);setError('');}} style={{background:'none',border:'none',cursor:'pointer',color:'#0A66C2',fontSize:'13px',fontWeight:600,padding:'0',fontFamily:"'Source Sans Pro',sans-serif"}}>← Back</button>
+                  <p style={{color:'rgba(0,0,0,0.5)',fontSize:'13px',fontWeight:600,textTransform:'uppercase',letterSpacing:'0.06em'}}>Step 2 of 2 — Your voice</p>
+                </div>
+                <p style={{color:'rgba(0,0,0,0.5)',fontSize:'13px',lineHeight:1.6,marginTop:'-8px'}}>This is what makes your posts sound like <em>you</em> — not a generic professional.</p>
+
+                {/* ROLE */}
+                <div>
+                  {lbl('What best describes you?')}
+                  <div style={{position:'relative'}}>
+                    <select value={form.role} onChange={e=>setForm({...form,role:e.target.value})} onFocus={()=>setFocused('role')} onBlur={()=>setFocused(null)} style={{...inp('role'),cursor:'pointer',color:form.role?'rgba(0,0,0,0.9)':'rgba(0,0,0,0.38)'}}>
+                      <option value="" disabled>Select your role</option>
+                      {ROLES.map(o=><option key={o} value={o}>{o}</option>)}
+                    </select>
+                    <span style={{position:'absolute',right:'10px',top:'50%',transform:'translateY(-50%)',color:'rgba(0,0,0,0.3)',pointerEvents:'none',fontSize:'10px'}}>▾</span>
+                  </div>
+                </div>
+
+                {/* EXPERIENCE */}
+                <div>
+                  {lbl('Years of experience', false)}
+                  <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
+                    {['0–2 years','3–5 years','6–10 years','10+ years'].map(s=>(
+                      <button key={s} onClick={()=>setForm({...form,experience:s})} className={`sal-btn ${form.experience===s?'active':''}`}>{s}</button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* AUDIENCE */}
+                <div>
+                  {lbl('Who do you write for on LinkedIn?')}
+                  <div style={{position:'relative'}}>
+                    <select value={form.audience} onChange={e=>setForm({...form,audience:e.target.value})} onFocus={()=>setFocused('audience')} onBlur={()=>setFocused(null)} style={{...inp('audience'),cursor:'pointer',color:form.audience?'rgba(0,0,0,0.9)':'rgba(0,0,0,0.38)'}}>
+                      <option value="" disabled>Select your target audience</option>
+                      {AUDIENCES.map(o=><option key={o} value={o}>{o}</option>)}
+                    </select>
+                    <span style={{position:'absolute',right:'10px',top:'50%',transform:'translateY(-50%)',color:'rgba(0,0,0,0.3)',pointerEvents:'none',fontSize:'10px'}}>▾</span>
+                  </div>
+                </div>
+
+                {/* POST STYLE */}
+                <div>
+                  {lbl('How do you want your posts to feel?')}
+                  <div className="style-grid" style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'8px'}}>
+                    {POST_STYLES.map(s=>(
+                      <div key={s.id} className={`style-card ${form.postStyle===s.id?'active':''}`} onClick={()=>setForm({...form,postStyle:s.id})}>
+                        <div style={{fontSize:'20px',marginBottom:'6px'}}>{s.icon}</div>
+                        <div style={{fontSize:'13px',fontWeight:700,color:form.postStyle===s.id?'#0A66C2':'rgba(0,0,0,0.8)',marginBottom:'3px'}}>{s.label}</div>
+                        <div style={{fontSize:'11px',color:'rgba(0,0,0,0.45)',lineHeight:1.4}}>{s.desc}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* OPINION */}
+                <div>
+                  {lbl('One thing most people in your field get wrong', false)}
+                  <input type="text" placeholder="e.g. Most managers hire for skills, not attitude..." value={form.opinion} onChange={e=>setForm({...form,opinion:e.target.value})} onFocus={()=>setFocused('opinion')} onBlur={()=>setFocused(null)} style={inp('opinion')}/>
+                  <p style={{color:'rgba(0,0,0,0.35)',fontSize:'12px',marginTop:'4px'}}>This makes your posts sound like you — not a generic professional. Skip if unsure.</p>
+                </div>
+
+                {error&&<div style={{background:'#FDF0EB',border:'1px solid rgba(178,64,32,0.25)',color:'#B24020',padding:'10px 14px',borderRadius:'6px',fontSize:'14px'}}>{error}</div>}
+
+                <button onClick={submit} disabled={loading} style={{marginTop:'4px',background:loading?'#F3F2EE':'#0A66C2',color:loading?'rgba(0,0,0,0.35)':'#fff',border:`1.5px solid ${loading?'rgba(0,0,0,0.12)':'#0A66C2'}`,borderRadius:'20px',padding:'12px',fontFamily:"'Source Sans Pro',sans-serif",fontWeight:700,fontSize:'15px',cursor:loading?'not-allowed':'pointer',width:'100%',transition:'all 0.15s'}}
+                  onMouseEnter={e=>{if(!loading)e.currentTarget.style.background='#004182';}}
+                  onMouseLeave={e=>{if(!loading)e.currentTarget.style.background='#0A66C2';}}>
+                  {loading?'Setting up your account…':'Start My Free 3-Day Trial →'}
+                </button>
+                <p style={{textAlign:'center',color:'rgba(0,0,0,0.38)',fontSize:'12px',lineHeight:1.8}}>
+                  ✓ No credit card required &nbsp;·&nbsp; ✓ Cancel anytime &nbsp;·&nbsp; ✓ Posts arrive today
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </section>
