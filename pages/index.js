@@ -8,10 +8,10 @@ const TONES = ['Professional & Authoritative','Conversational & Friendly','Bold 
 const ROLES = ['Employee / Professional','Business Owner / Entrepreneur','Freelancer / Consultant','Student / Fresh Graduate','Job Seeker'];
 const AUDIENCES = ['Industry peers & professionals','Potential clients & customers','Recruiters & hiring managers','Junior professionals & students','General business audience','C-suite & decision makers'];
 const POST_STYLES = [
-  {id:'punchy',icon:'⚡',label:'Punchy',desc:'Short. Direct. One idea. Max impact. (3–5 lines)'},
-  {id:'storytelling',icon:'📖',label:'Storytelling',desc:'Personal narrative with a lesson. (8–12 lines)'},
-  {id:'educational',icon:'🎓',label:'Educational',desc:'Teach something. Lists & frameworks. (10–15 lines)'},
-  {id:'provocative',icon:'🔥',label:'Provocative',desc:'Challenge assumptions. Start debate. (6–10 lines)'},
+  {id:'punchy',icon:'⚡',label:'Punchy',desc:'Short. Direct. One idea. Max impact.',lines:'3–5 lines'},
+  {id:'storytelling',icon:'📖',label:'Storytelling',desc:'Personal narrative with a lesson.',lines:'8–12 lines'},
+  {id:'educational',icon:'🎓',label:'Educational',desc:'Teach something. Lists & frameworks.',lines:'10–15 lines'},
+  {id:'provocative',icon:'🔥',label:'Provocative',desc:'Challenge assumptions. Start debate.',lines:'6–10 lines'},
 ];
 const FAQS = [
   {q:'What happens after the 3-day free trial?',a:'Your posts pause automatically. You receive an email with a link to subscribe. No credit card is taken during the trial — ever.'},
@@ -48,7 +48,7 @@ export default function Home() {
 
   const nextStep = ()=>{
     setError('');
-    if(!form.name||!form.email||!form.country||!form.niche||!form.tone){
+    if(!form.salutation||!form.name||!form.email||!form.country||!form.niche||!form.tone){
       setError('Please fill in all required fields.');return;
     }
     const emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -59,7 +59,7 @@ export default function Home() {
 
   const submit = async()=>{
     setError('');
-    if(!form.role||!form.audience||!form.postStyle){
+    if(!form.role||!form.experience||!form.audience||!form.postStyle){
       setError('Please complete all required fields in this section.');return;
     }
     setLoading(true);
@@ -462,17 +462,18 @@ export default function Home() {
 
                 {/* SALUTATION */}
                 <div>
-                  {lbl('Title', false)}
+                  {lbl('Title')}
                   <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
                     {['Mr','Mrs','Ms','Prefer not to say'].map(s=>(
                       <button key={s} onClick={()=>setForm({...form,salutation:s})} className={`sal-btn ${form.salutation===s?'active':''}`}>{s}</button>
                     ))}
                   </div>
+                  {error&&!form.salutation&&<p style={{color:'#B24020',fontSize:'12px',marginTop:'4px'}}>Please select a title</p>}
                 </div>
 
                 {/* NAME + EMAIL */}
                 <div className="grid-2" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'14px'}}>
-                  {[['name','Full Name','text','Your name'],['email','Email','email','you@company.com']].map(([k,l,t,p])=>(
+                  {[['name','Full Name','text','Your name'],['email','Email','email','you@email.com']].map(([k,l,t,p])=>(
                     <div key={k}>
                       {lbl(l)}
                       <input type={t} placeholder={p} value={form[k]} onChange={e=>setForm({...form,[k]:e.target.value})} onFocus={()=>setFocused(k)} onBlur={()=>setFocused(null)} style={inp(k)}/>
@@ -550,12 +551,13 @@ export default function Home() {
 
                 {/* EXPERIENCE */}
                 <div>
-                  {lbl('Years of experience', false)}
+                  {lbl('Years of experience')}
                   <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
                     {['0–2 years','3–5 years','6–10 years','10+ years'].map(s=>(
                       <button key={s} onClick={()=>setForm({...form,experience:s})} className={`sal-btn ${form.experience===s?'active':''}`}>{s}</button>
                     ))}
                   </div>
+                  {error&&!form.experience&&<p style={{color:'#B24020',fontSize:'12px',marginTop:'4px'}}>Please select your years of experience</p>}
                 </div>
 
                 {/* AUDIENCE */}
@@ -577,8 +579,9 @@ export default function Home() {
                     {POST_STYLES.map(s=>(
                       <div key={s.id} className={`style-card ${form.postStyle===s.id?'active':''}`} onClick={()=>setForm({...form,postStyle:s.id})}>
                         <div style={{fontSize:'20px',marginBottom:'6px'}}>{s.icon}</div>
-                        <div style={{fontSize:'13px',fontWeight:700,color:form.postStyle===s.id?'#0A66C2':'rgba(0,0,0,0.8)',marginBottom:'3px'}}>{s.label}</div>
-                        <div style={{fontSize:'11px',color:'rgba(0,0,0,0.45)',lineHeight:1.4}}>{s.desc}</div>
+                        <div style={{fontSize:'13px',fontWeight:700,color:form.postStyle===s.id?'#0A66C2':'rgba(0,0,0,0.8)',marginBottom:'4px'}}>{s.label}</div>
+                        <div style={{fontSize:'11px',color:'rgba(0,0,0,0.45)',lineHeight:1.4,marginBottom:'4px'}}>{s.desc}</div>
+                        <div style={{fontSize:'10px',color:form.postStyle===s.id?'#0A66C2':'rgba(0,0,0,0.3)',fontWeight:600}}>{s.lines}</div>
                       </div>
                     ))}
                   </div>
