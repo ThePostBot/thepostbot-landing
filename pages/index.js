@@ -11,7 +11,7 @@ const POST_STYLES = [
   {id:'punchy',icon:'⚡',label:'Punchy',desc:'Short. Direct. One idea. Max impact.',lines:'3–5 lines'},
   {id:'storytelling',icon:'📖',label:'Storytelling',desc:'Personal narrative with a lesson.',lines:'8–12 lines'},
   {id:'educational',icon:'🎓',label:'Educational',desc:'Teach something. Lists & frameworks.',lines:'10–15 lines'},
-  {id:'provocative',icon:'🔥',label:'Provocative',desc:'Challenge assumptions. Start debate.',lines:'6–10 lines'},
+  {id:'provocative',icon:'🔥',label:'Provocative',desc:'Challenge norms. Start debate.',lines:'6–10 lines'},
 ];
 const FAQS = [
   {q:'What happens after the 3-day free trial?',a:'Your posts pause automatically. You receive an email with a link to subscribe. No credit card is taken during the trial — ever.'},
