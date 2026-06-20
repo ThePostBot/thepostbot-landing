@@ -8,10 +8,10 @@ const TONES = ['Professional & Authoritative','Conversational & Friendly','Bold 
 const ROLES = ['Employee / Professional','Business Owner / Entrepreneur','Freelancer / Consultant','Student / Fresh Graduate','Job Seeker'];
 const AUDIENCES = ['Industry peers & professionals','Potential clients & customers','Recruiters & hiring managers','Junior professionals & students','General business audience','C-suite & decision makers'];
 const POST_STYLES = [
-  {id:'punchy',icon:'⚡',label:'Punchy',desc:'Short. Direct. One idea. Max impact.'},
-  {id:'storytelling',icon:'📖',label:'Storytelling',desc:'Personal narrative with a lesson.'},
-  {id:'educational',icon:'🎓',label:'Educational',desc:'Teach something. Lists & frameworks.'},
-  {id:'provocative',icon:'🔥',label:'Provocative',desc:'Challenge assumptions. Start debate.'},
+  {id:'punchy',icon:'⚡',label:'Punchy',desc:'Short. Direct. One idea. Max impact. (3–5 lines)'},
+  {id:'storytelling',icon:'📖',label:'Storytelling',desc:'Personal narrative with a lesson. (8–12 lines)'},
+  {id:'educational',icon:'🎓',label:'Educational',desc:'Teach something. Lists & frameworks. (10–15 lines)'},
+  {id:'provocative',icon:'🔥',label:'Provocative',desc:'Challenge assumptions. Start debate. (6–10 lines)'},
 ];
 const FAQS = [
   {q:'What happens after the 3-day free trial?',a:'Your posts pause automatically. You receive an email with a link to subscribe. No credit card is taken during the trial — ever.'},
