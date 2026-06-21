@@ -590,7 +590,7 @@ export default function Home() {
                 {/* OPINION */}
                 <div>
                   {lbl('One thing most people in your field get wrong', false)}
-                  <input type="text" placeholder="e.g. Most managers focus on skills when hiring, but attitude is what actually determines success..." value={form.opinion} onChange={e=>setForm({...form,opinion:e.target.value})} onFocus={()=>setFocused('opinion')} onBlur={()=>setFocused(null)} style={inp('opinion')}/>
+                  <input type="text" placeholder="e.g. Most managers hire for skills, but attitude determines success..." value={form.opinion} onChange={e=>setForm({...form,opinion:e.target.value})} onFocus={()=>setFocused('opinion')} onBlur={()=>setFocused(null)} style={inp('opinion')}/>
                   <p style={{color:'rgba(0,0,0,0.35)',fontSize:'12px',marginTop:'4px'}}>Your unique perspective makes your posts stand out. The more specific your opinion, the more engagement your posts will get. Skip if unsure.</p>
                 </div>
 
