@@ -512,8 +512,8 @@ export default function Home() {
                 {/* KEYWORD */}
                 <div>
                   {lbl('Topic / Keyword', false)}
-                  <input type="text" placeholder="e.g. AI, Dubai real estate, remote work..." value={form.keyword} onChange={e=>setForm({...form,keyword:e.target.value})} onFocus={()=>setFocused('keyword')} onBlur={()=>setFocused(null)} style={inp('keyword')}/>
-                  <p style={{color:'rgba(0,0,0,0.35)',fontSize:'12px',marginTop:'4px'}}>Leave empty — we use today's trending news automatically</p>
+                  <input type="text" placeholder="e.g. your company, a product you work on, or a topic you want to be known for..." value={form.keyword} onChange={e=>setForm({...form,keyword:e.target.value})} onFocus={()=>setFocused('keyword')} onBlur={()=>setFocused(null)} style={inp('keyword')}/>
+                  <p style={{color:'rgba(0,0,0,0.35)',fontSize:'12px',marginTop:'4px'}}>This gets woven into your posts naturally. Leave empty and we use today's trending news automatically.</p>
                 </div>
 
                 {error&&<div style={{background:'#FDF0EB',border:'1px solid rgba(178,64,32,0.25)',color:'#B24020',padding:'10px 14px',borderRadius:'6px',fontSize:'14px'}}>{error}</div>}
@@ -590,8 +590,8 @@ export default function Home() {
                 {/* OPINION */}
                 <div>
                   {lbl('One thing most people in your field get wrong', false)}
-                  <input type="text" placeholder="e.g. Most managers hire for skills, not attitude..." value={form.opinion} onChange={e=>setForm({...form,opinion:e.target.value})} onFocus={()=>setFocused('opinion')} onBlur={()=>setFocused(null)} style={inp('opinion')}/>
-                  <p style={{color:'rgba(0,0,0,0.35)',fontSize:'12px',marginTop:'4px'}}>This makes your posts sound like you — not a generic professional. Skip if unsure.</p>
+                  <input type="text" placeholder="e.g. Most managers focus on skills when hiring, but attitude is what actually determines success..." value={form.opinion} onChange={e=>setForm({...form,opinion:e.target.value})} onFocus={()=>setFocused('opinion')} onBlur={()=>setFocused(null)} style={inp('opinion')}/>
+                  <p style={{color:'rgba(0,0,0,0.35)',fontSize:'12px',marginTop:'4px'}}>Your unique perspective makes your posts stand out. The more specific your opinion, the more engagement your posts will get. Skip if unsure.</p>
                 </div>
 
                 {error&&<div style={{background:'#FDF0EB',border:'1px solid rgba(178,64,32,0.25)',color:'#B24020',padding:'10px 14px',borderRadius:'6px',fontSize:'14px'}}>{error}</div>}
